@@ -148,7 +148,6 @@ pygments_style = "sphinx"
 # If this is True, todo emits a warning for each TODO entries. The default is False.
 todo_emit_warnings = True
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -158,10 +157,7 @@ html_theme = "alabaster"
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {
-    "sidebar_width": "300px",
-    "page_width": "1200px"
-}
+html_theme_options = {"sidebar_width": "300px", "page_width": "1200px"}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
@@ -231,7 +227,6 @@ html_static_path = ["_static"]
 # Output file base name for HTML help builder.
 htmlhelp_basename = "neonwranglerpy-doc"
 
-
 # -- Options for LaTeX output ------------------------------------------------
 
 latex_elements = {
@@ -245,9 +240,8 @@ latex_elements = {
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [
-    ("index", "user_guide.tex", "neonwranglerpy Documentation", "henrykironde", "manual")
-]
+latex_documents = [("index", "user_guide.tex", "neonwranglerpy Documentation",
+                    "henrykironde", "manual")]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
