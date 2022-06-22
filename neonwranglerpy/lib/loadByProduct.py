@@ -5,8 +5,13 @@ from neonwranglerpy.lib.zipsByProduct import zips_by_product
 from neonwranglerpy.lib.stackByTable import stack_by_table
 
 
-def load_by_product(dpID, site='all', start_date=None, end_date=None, package="basic",
-                    release="current", path='./'):
+def load_by_product(dpID,
+                    site='all',
+                    start_date=None,
+                    end_date=None,
+                    package="basic",
+                    release="current",
+                    path='./'):
     """
     :param path:
     :param dpID: productID
