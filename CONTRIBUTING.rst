@@ -4,7 +4,6 @@ Contributing
 
 Welcome to ``neonwranglerpy`` contributor's guide.
 
- 
 
 
 Issue Reports

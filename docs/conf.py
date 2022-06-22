@@ -18,7 +18,7 @@ __location__ = os.path.dirname(__file__)
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.join(__location__, "../src"))
+sys.path.insert(0, os.path.join(__location__, "../neonwranglerpy"))
 
 # -- Run sphinx-apidoc -------------------------------------------------------
 # This hack is necessary since RTD does not issue `sphinx-apidoc` before running
@@ -34,7 +34,7 @@ except ImportError:
     from sphinx import apidoc
 
 output_dir = os.path.join(__location__, "api")
-module_dir = os.path.join(__location__, "../src/neonwranglerpy")
+module_dir = os.path.join(__location__, "../neonwranglerpy")
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -88,7 +88,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "neonwranglerpy"
-copyright = "2022, henrykironde"
+copyright = "2022, Weecology"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
