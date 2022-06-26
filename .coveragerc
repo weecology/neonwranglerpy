@@ -6,7 +6,7 @@ source = neonwranglerpy
 
 [paths]
 source =
-    neonwranglerpy/src/
+    neonwranglerpy/
     */site-packages/
 
 [report]

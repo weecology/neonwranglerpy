@@ -13,7 +13,7 @@ def get_api(api_url, token=None):
                                     'X-API-Token': token,
                                     'accept': 'application/json'
                                 })
-        return response.json()
+        return response
     except Exception as e:
         print(e)
 
