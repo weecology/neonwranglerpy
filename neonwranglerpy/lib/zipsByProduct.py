@@ -11,22 +11,28 @@ from neonwranglerpy.lib.getzipurls import get_zip_urls
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
 
 
-def zips_by_product(dpID,
-                    site='all',
-                    start_date='',
-                    end_date='',
-                    package="basic",
-                    release="current",
-                    savepath='',
-                    token=None):
+def zips_by_product(
+        dpID,
+        site='all',
+        start_date='',
+        end_date='',
+        package="basic",
+        release="current",
+        savepath='.',
+        token=None
+        ):
     # if (package != 'basic') or (package != 'extended'):
     #     print(f"{package} is not a valid package name. Package must be basic or expanded")
     #     return
 
-    # TODO: add a check for correct format of product ID
     # TODO: add a check for AOP data product
 
     global zip_dir_path
+
+    if not re.match("DP[1-4]{1}.[0-9]{5}.00[0-9]{1}", dpID):
+        return f"{dpID} is not a properly formatted data product ID. The correct format is DP#.#####.00#, " \
+               f"where the first placeholder must be between 1 and 4."
+
     if len(start_date):
         if not re.match(DATE_PATTERN, start_date):
             return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
@@ -95,9 +101,11 @@ def zips_by_product(dpID,
     # TODO: add progress bar
 
     for zips in temp:
-        dirname = '.'.join([
-            'NEON', zips['productCode'], zips['siteCode'], zips['month'], zips['release']
-        ])
+        dirname = '.'.join(
+            [
+                'NEON', zips['productCode'], zips['siteCode'], zips['month'], zips['release']
+            ]
+        )
         zip_dir_path = os.path.join(tempdir, f'{dirname}')
         os.mkdir(zip_dir_path)
         for file in zips['files']:
