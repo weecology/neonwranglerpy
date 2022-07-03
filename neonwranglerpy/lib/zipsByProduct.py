@@ -4,23 +4,21 @@ from shutil import rmtree
 import os.path
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
-from neonwranglerpy.lib.tools import get_api, get_month_year_urls
+from neonwranglerpy.lib.tools import get_api, get_month_year_urls, create_temp
 from neonwranglerpy.lib.defaults import NEON_API_BASE_URL
 from neonwranglerpy.lib.getzipurls import get_zip_urls
 
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
 
 
-def zips_by_product(
-        dpID,
-        site='all',
-        start_date='',
-        end_date='',
-        package="basic",
-        release="current",
-        savepath='.',
-        token=None
-        ):
+def zips_by_product(dpID,
+                    site='all',
+                    start_date='',
+                    end_date='',
+                    package="basic",
+                    release="current",
+                    savepath='.',
+                    token=None):
     # if (package != 'basic') or (package != 'extended'):
     #     print(f"{package} is not a valid package name. Package must be basic or expanded")
     #     return
@@ -89,32 +87,28 @@ def zips_by_product(
     tempdir = ''
     if not len(savepath):
         # dir_path = os.path.join(os.getcwd(), f"/filesToStack/{dpID}")
-        tempdir = mkdtemp(dir=savepath)
+        tempdir = mkdtemp(dir=os.path.abspath(savepath))
 
     else:
-        if os.path.exists(savepath):
-            # dir_path = os.path.join(savepath, f"/filesToStack/{dpID}")
-            tempdir = mkdtemp(dir=savepath)
-        else:
-            print(f"{savepath} doesn't exist")
+        tempdir = create_temp(os.path.abspath(savepath))
 
     # TODO: add progress bar
 
-    for zips in temp:
-        dirname = '.'.join(
-            [
-                'NEON', zips['productCode'], zips['siteCode'], zips['month'], zips['release']
-            ]
-        )
-        zip_dir_path = os.path.join(tempdir, f'{dirname}')
-        os.mkdir(zip_dir_path)
-        for file in zips['files']:
-            try:
-                save_path = os.path.join(zip_dir_path, f"{file['name']}")
-                file_path, _ = urlretrieve(file['url'], save_path)
+    if tempdir:
+        for zips in temp:
+            dirname = '.'.join([
+                'NEON', zips['productCode'], zips['siteCode'], zips['month'],
+                zips['release']
+            ])
+            zip_dir_path = os.path.join(tempdir, f'{dirname}')
+            os.mkdir(zip_dir_path)
+            for file in zips['files']:
+                try:
+                    save_path = os.path.join(zip_dir_path, f"{file['name']}")
+                    file_path, _ = urlretrieve(file['url'], save_path)
 
-            except HTTPError as e:
-                print("HTTPError :", e)
-                return None
+                except HTTPError as e:
+                    print("HTTPError :", e)
+                    return None
 
-    return zip_dir_path
+    return tempdir
