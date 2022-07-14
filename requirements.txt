@@ -3,3 +3,5 @@ pytest
 yapf
 toml
 requests
+rpy2
+pandas

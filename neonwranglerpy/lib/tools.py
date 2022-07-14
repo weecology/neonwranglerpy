@@ -1,6 +1,21 @@
 import re
 import requests
+from requests import get
 from datetime import datetime
+import rpy2.robjects as robjects
+from rpy2.robjects.conversion import localconverter
+from rpy2.robjects import pandas2ri
+
+
+def get_tables():
+    rda_file = robjects.r.load("table_types.rda")
+    df = robjects.globalenv['table_types']
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        table_types_df = robjects.conversion.rpy2py(df)
+    table_types_df.to_csv('neonwranglerpy/data/table_types.csv',
+                          index=False,
+                          columns=['productID', 'tableName', 'tableType'])
+    return
 
 
 def get_api(api_url, token=None):
