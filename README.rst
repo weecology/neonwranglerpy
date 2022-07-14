@@ -10,6 +10,8 @@ New repo for the neonwranglerpy package
    :alt: Documentation Status
 .. image:: https://codecov.io/gh/weecology/neonwranglerpy/branch/main/graph/badge.svg?token=VtrYdLrEMV
    :target: https://codecov.io/gh/weecology/neonwranglerpy
-
+.. image:: http://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://raw.githubusercontent.com/weecology/neonwranglerpy/main/LICENSE
+   :alt: License
 
 The ...
