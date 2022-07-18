@@ -75,3 +75,42 @@ def get_all_files(folder_path, dir_name=False):
             else:
                 files.append(file)
     return files
+
+
+def create_temp(dst):
+    """ creates temporary directory"""
+    if not os.path.exists(dst):
+        print(f'{dst} does not exists')
+        return None
+    tempdir = mkdtemp(dir=dst)
+    return tempdir
+
+
+def copy_zips(src, dst):
+    """ Copies zip files to a temp dir """
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+
+    lst = os.listdir(src)
+
+    for item in lst:
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            copy_zips(s, d)
+        else:
+            shutil.copy2(s, d)
+    return
+
+
+def copy_zip(src, dst):
+    """ Copies a files to dir """
+    dir_path, file_name = os.path.split(dst)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    if not os.path.isfile(src):
+        print('This function only works for zip or file')
+
+    shutil.copy2(src, dst)
+    return
