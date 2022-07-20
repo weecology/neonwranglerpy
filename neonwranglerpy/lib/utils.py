@@ -23,6 +23,4 @@ def get_variables(varfile):
 
     if 'table' in df.columns:
         return df[['table', 'fieldName', 'colClass']]
-
     return df[['fieldName', 'colClass']]
-    # take out "
