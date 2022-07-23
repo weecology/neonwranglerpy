@@ -10,6 +10,9 @@ from rpy2.robjects import pandas2ri
 
 
 def get_tables():
+    """
+    convert table_types.rda to table_types.csv
+    """
     rda_file = robjects.r.load("table_types.rda")
     df = robjects.globalenv['table_types']
     with localconverter(robjects.default_converter + pandas2ri.converter):
