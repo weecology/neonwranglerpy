@@ -1,17 +1,17 @@
 import os.path
-import pkg_resources
 import pandas as pd
+from neonwranglerpy import get_data
 import neonwranglerpy.lib.tools as tl
 import neonwranglerpy.lib.utils as ut
 
 
 def load_table_types(dpID: str):
     """Return the dataframe about the table types of Data Products"""
-
-    stream = pkg_resources.resource_stream(__name__, 'data/table_types.csv')
+    stream = get_data('table_types.csv')
     df = pd.read_csv(stream)
-    table_types = df[df['productID'] == dpID].reset_index()
-    return table_types
+    table_types = df[df['productID'] == dpID]
+    table = table_types.reset_index(drop=True)
+    return table
 
 
 def stackdatafiles(folder_path, dst, dpID):
