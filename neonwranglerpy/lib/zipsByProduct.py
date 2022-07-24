@@ -62,7 +62,11 @@ def zips_by_product(dpID,
     if site == 'all':
         month_urls = all_urls
     else:
-        month_urls = [x for x in all_urls if re.search(site, x)]
+        if type(site) == str:
+            package_name = list(site.split(' '))
+        for package in site:
+            month_site = [x for x in all_urls if re.search(package, x)]
+            month_urls.extend(month_site)
 
     if not len(month_urls):
         print(f"There is no data for site {site}")
