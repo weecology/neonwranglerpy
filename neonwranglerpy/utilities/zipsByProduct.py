@@ -4,9 +4,9 @@ from shutil import rmtree
 import os.path
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
-from neonwranglerpy.lib.tools import get_api, get_month_year_urls, create_temp
-from neonwranglerpy.lib.defaults import NEON_API_BASE_URL
-from neonwranglerpy.lib.getzipurls import get_zip_urls
+from neonwranglerpy.utilities.tools import get_api, get_month_year_urls, create_temp
+from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
+from neonwranglerpy.utilities.getzipurls import get_zip_urls
 
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
 

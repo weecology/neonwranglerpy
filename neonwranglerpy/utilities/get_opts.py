@@ -1,5 +1,5 @@
 import argparse
-from neonwranglerpy.lib.defaults import VERSION
+from neonwranglerpy.utilities.defaults import VERSION
 
 parser = argparse.ArgumentParser(prog="neonwranglerpy")
 parser.add_argument('-v', '--version', action='version', version=VERSION)

@@ -1,6 +1,6 @@
 import re
 from os import path
-from neonwranglerpy.lib.tools import create_temp, copy_zips
+from neonwranglerpy.utilities.tools import create_temp, copy_zips
 
 
 def stack_by_table(filepath="./stack", savepath=".", dpID=None, package=None):

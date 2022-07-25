@@ -1,6 +1,6 @@
 import os
-from .lib import *
-from neonwranglerpy.lib.tools import get_tables
+from .utilities import *
+from neonwranglerpy.utilities.tools import get_tables
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
