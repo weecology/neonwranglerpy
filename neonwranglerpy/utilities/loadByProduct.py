@@ -1,8 +1,8 @@
 import os.path
 from tempfile import mkdtemp
 from shutil import rmtree
-from neonwranglerpy.lib.zipsByProduct import zips_by_product
-from neonwranglerpy.lib.stackByTable import stack_by_table
+from neonwranglerpy.utilities.zipsByProduct import zips_by_product
+from neonwranglerpy.utilities.stackByTable import stack_by_table
 
 
 def load_by_product(dpID,

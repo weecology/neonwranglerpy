@@ -1,8 +1,8 @@
 import os.path
 import pandas as pd
 from neonwranglerpy import get_data
-import neonwranglerpy.lib.tools as tl
-import neonwranglerpy.lib.utils as ut
+import neonwranglerpy.utilities.tools as tl
+import neonwranglerpy.utilities.utils as ut
 
 
 def load_table_types(dpID: str):

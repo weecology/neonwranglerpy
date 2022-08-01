@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from neonwranglerpy.lib.get_opts import parser
+from neonwranglerpy.utilities.get_opts import parser
 
 _logger = logging.getLogger(__name__)
 

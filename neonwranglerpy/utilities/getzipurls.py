@@ -1,4 +1,4 @@
-from neonwranglerpy.lib.tools import get_api
+from neonwranglerpy.utilities.tools import get_api
 
 
 def get_zip_urls(month_urls, package, dpID, release, token=None):
