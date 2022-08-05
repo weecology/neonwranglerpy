@@ -11,19 +11,23 @@ from neonwranglerpy.utilities.getzipurls import get_zip_urls
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
 
 
-def zips_by_product(dpID,
-                    site='all',
-                    start_date='',
-                    end_date='',
-                    package="basic",
-                    release="current",
-                    savepath='.',
-                    token=None):
+def zips_by_product(
+        dpID,
+        site='all',
+        start_date='',
+        end_date='',
+        package="basic",
+        release="current",
+        savepath='',
+        token=None
+):
     # if (package != 'basic') or (package != 'extended'):
     #     print(f"{package} is not a valid package name. Package must be basic or expanded")
     #     return
 
-    # TODO: add a check for AOP data product
+    if dpID[4:5] == 3 and dpID != "DP1.30012.001":
+        return f'{dpID}, "is a remote sensing data product and cannot be loaded directly to R with this function.Use ' \
+               f'the byFileAOP() or byTileAOP() function to download locally." '
 
     global zip_dir_path
 
@@ -84,27 +88,32 @@ def zips_by_product(dpID,
     if not len(month_urls):
         print("There is no data for selected dates")
 
+    # list of all the urls of the files
     temp = get_zip_urls(month_urls, package, dpID, release, token)
 
     # TODO: calculate download size
     # TODO: user input for downloading or not
-    tempdir = ''
     if not len(savepath):
-        # dir_path = os.path.join(os.getcwd(), f"/filesToStack/{dpID}")
-        tempdir = mkdtemp(dir=os.path.abspath(savepath))
+        savepath = "."
+        tempdir = create_temp(os.path.abspath(savepath))
+        dir_path = os.path.join(tempdir, "filesToStack")
+        os.mkdir(dir_path)
 
     else:
-        tempdir = create_temp(os.path.abspath(savepath))
+        dir_path = os.path.join(savepath, "filesToStack")
+        os.mkdir(dir_path)
 
     # TODO: add progress bar
 
-    if tempdir:
+    if dir_path:
         for zips in temp:
-            dirname = '.'.join([
-                'NEON', zips['productCode'], zips['siteCode'], zips['month'],
-                zips['release']
-            ])
-            zip_dir_path = os.path.join(tempdir, f'{dirname}')
+            dirname = '.'.join(
+                [
+                    'NEON', zips['productCode'], zips['siteCode'], zips['month'],
+                    zips['release']
+                ]
+            )
+            zip_dir_path = os.path.join(dir_path, f'{dirname}')
             os.mkdir(zip_dir_path)
             for file in zips['files']:
                 try:
@@ -114,5 +123,5 @@ def zips_by_product(dpID,
                 except HTTPError as e:
                     print("HTTPError :", e)
                     return None
-
-    return tempdir
+    # returns the path to /filestostack directory
+    return dir_path

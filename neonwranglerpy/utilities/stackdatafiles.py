@@ -14,7 +14,7 @@ def load_table_types(dpID: str):
     return table
 
 
-def stackdatafiles(folder_path, dst, dpID):
+def stackdatafiles(folder_path, dst, dpID, stack_df=False):
     """ Stack the files"""
 
     if not os.path.exists(folder_path):
@@ -63,9 +63,8 @@ def stackdatafiles(folder_path, dst, dpID):
         print(
             "copying the most recent publication of categoricalCodes file to /stackedFiles"
         )
-
+    out = {}
     # stacking the files
-
     for i in range(len(table_names)):
         file_list = [file for file in filepaths if table_names[i] in file]
         file_list.sort()
@@ -89,6 +88,11 @@ def stackdatafiles(folder_path, dst, dpID):
 
         stacked_df = pd.concat(stacking_list, axis=0)
         df_save_path = os.path.join(stackedpath, f"{table_names[i]}_{dpID}.csv")
+
+        if stack_df:
+            out[table_names[i]] = stacked_df
         stacked_df.to_csv(df_save_path)
 
-    return stackedpath
+    out['stackedpath'] = stackedpath
+
+    return out
