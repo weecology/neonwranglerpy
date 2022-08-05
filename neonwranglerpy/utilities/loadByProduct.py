@@ -8,17 +8,15 @@ from neonwranglerpy.utilities.stackByTable import stack_by_table
 DATE_PATTERN = compile('20[0-9]{2}-[0-9]{2}')
 
 
-def load_by_product(
-        dpID,
-        site='all',
-        start_date=None,
-        end_date=None,
-        package="basic",
-        release="current",
-        path='./',
-        save_files=False,
-        stacked_df=False
-):
+def load_by_product(dpID,
+                    site='all',
+                    start_date=None,
+                    end_date=None,
+                    package="basic",
+                    release="current",
+                    path='./',
+                    save_files=False,
+                    stacked_df=False):
     # if package != "basic" or package != "expanded":
     #     print(f"{package} is not a valid package name. Package must be basic or expanded")
     #     return
@@ -52,9 +50,15 @@ def load_by_product(
     tempdir = mkdtemp(dir=os.path.dirname(path))
 
     # pass the request to zipsByProduct() to download
-    path = zips_by_product(dpID, site, start_date, end_date, package, release, savepath=tempdir)
+    path = zips_by_product(dpID,
+                           site,
+                           start_date,
+                           end_date,
+                           package,
+                           release,
+                           savepath=tempdir)
     # stack the tables by using stackByTable\
-    out = stack_by_table(filepath=path,dpID=dpID,savepath=tempdir,stack_df=stacked_df)
+    out = stack_by_table(filepath=path, dpID=dpID, savepath=tempdir, stack_df=stacked_df)
     # removes temp dir
     if not save_files:
         rmtree(tempdir)

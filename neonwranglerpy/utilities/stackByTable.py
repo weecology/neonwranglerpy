@@ -6,7 +6,11 @@ from neonwranglerpy.utilities.stackdatafiles import stackdatafiles
 from neonwranglerpy.utilities.tools import create_temp, copy_zips
 
 
-def stack_by_table(filepath="filesTostack", savepath=".", dpID=None, package=None, stack_df=False):
+def stack_by_table(filepath="filesTostack",
+                   savepath=".",
+                   dpID=None,
+                   package=None,
+                   stack_df=False):
     if not path.exists(filepath):
         return f"{filepath} doesn't exists "
 
@@ -28,7 +32,7 @@ def stack_by_table(filepath="filesTostack", savepath=".", dpID=None, package=Non
     copy_zips(filepath, dst=tempdir)
 
     # pass the path of files to stackdatafiles function
-    out = stackdatafiles(tempdir, savepath, dpID,stack_df=stack_df)
+    out = stackdatafiles(tempdir, savepath, dpID, stack_df=stack_df)
 
     rmtree(tempdir)
     return out

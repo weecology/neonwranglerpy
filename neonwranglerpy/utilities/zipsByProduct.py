@@ -11,16 +11,14 @@ from neonwranglerpy.utilities.getzipurls import get_zip_urls
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
 
 
-def zips_by_product(
-        dpID,
-        site='all',
-        start_date='',
-        end_date='',
-        package="basic",
-        release="current",
-        savepath='',
-        token=None
-):
+def zips_by_product(dpID,
+                    site='all',
+                    start_date='',
+                    end_date='',
+                    package="basic",
+                    release="current",
+                    savepath='',
+                    token=None):
     # if (package != 'basic') or (package != 'extended'):
     #     print(f"{package} is not a valid package name. Package must be basic or expanded")
     #     return
@@ -107,12 +105,10 @@ def zips_by_product(
 
     if dir_path:
         for zips in temp:
-            dirname = '.'.join(
-                [
-                    'NEON', zips['productCode'], zips['siteCode'], zips['month'],
-                    zips['release']
-                ]
-            )
+            dirname = '.'.join([
+                'NEON', zips['productCode'], zips['siteCode'], zips['month'],
+                zips['release']
+            ])
             zip_dir_path = os.path.join(dir_path, f'{dirname}')
             os.mkdir(zip_dir_path)
             for file in zips['files']:
