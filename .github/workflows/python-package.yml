@@ -33,10 +33,7 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 ./neonwranglerpy --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 ./neonwranglerpy --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-        flake8 --ignore=E501,W503,E402,F401,F403,E722,F841,W504 neonwranglerpy --max-line-length=90 2>&1
+        flake8 ./neonwranglerpy --count --show-source --statistics
         yapf -d --recursive ./neonwranglerpy --style=.style.yapf 2>&1
 
     - name: Test with pytest
