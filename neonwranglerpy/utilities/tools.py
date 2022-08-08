@@ -24,9 +24,7 @@ def get_tables():
 
 
 def get_api(api_url, token=None):
-    """
-    returns the api response
-    """
+    """returns the api response"""
     try:
         response = requests.get(api_url,
                                 headers={
@@ -41,7 +39,7 @@ def get_api(api_url, token=None):
 
 
 def get_year_month(date):
-    """ returns the year-month of files"""
+    """returns the year-month of files"""
     return datetime.strptime(date, '%Y-%m').date()
 
 
