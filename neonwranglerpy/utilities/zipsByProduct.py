@@ -1,6 +1,5 @@
+"""Download the data files from NEON API."""
 import re
-from tempfile import mkdtemp
-from shutil import rmtree
 import os.path
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
@@ -19,27 +18,27 @@ def zips_by_product(dpID,
                     release="current",
                     savepath='',
                     token=None):
-    # if (package != 'basic') or (package != 'extended'):
-    #     print(f"{package} is not a valid package name. Package must be basic or expanded")
-    #     return
-
+    """Download the data files from NEON API."""
     if dpID[4:5] == 3 and dpID != "DP1.30012.001":
-        return f'{dpID}, "is a remote sensing data product and cannot be loaded directly to R with this function.Use ' \
-               f'the byFileAOP() or byTileAOP() function to download locally." '
+        return f'{dpID}, "is a remote sensing data product and cannot be loaded' \
+               f'directly to R with this function.Use the byFileAOP() or ' \
+               f'byTileAOP() function to download locally." '
 
     global zip_dir_path
 
     if not re.match("DP[1-4]{1}.[0-9]{5}.00[0-9]{1}", dpID):
-        return f"{dpID} is not a properly formatted data product ID. The correct format is DP#.#####.00#, " \
-               f"where the first placeholder must be between 1 and 4."
+        return f"{dpID} is not a properly formatted data product ID. The correct format" \
+               f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
 
     if len(start_date):
         if not re.match(DATE_PATTERN, start_date):
-            return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
+            return 'startdate and enddate must be either NA or valid dates in the form '\
+                   'YYYY-MM'
 
     if len(end_date):
         if not re.match(DATE_PATTERN, end_date):
-            return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
+            return 'startdate and enddate must be either NA or valid dates in the form '\
+                   'YYYY-MM'
 
     if release == 'current':
         api_url = NEON_API_BASE_URL + 'products/' + dpID
@@ -64,8 +63,8 @@ def zips_by_product(dpID,
     if site == 'all':
         month_urls = all_urls
     else:
-        if type(site) == str:
-            package_name = list(site.split(' '))
+        if isinstance(site, str):
+            site = list(site.split(' '))
         for package in site:
             month_site = [x for x in all_urls if re.search(package, x)]
             month_urls.extend(month_site)

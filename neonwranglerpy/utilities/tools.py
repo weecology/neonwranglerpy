@@ -1,3 +1,4 @@
+"""Tools functions."""
 import re
 import requests
 import os
@@ -10,10 +11,8 @@ from rpy2.robjects import pandas2ri
 
 
 def get_tables():
-    """
-    convert table_types.rda to table_types.csv
-    """
-    rda_file = robjects.r.load("table_types.rda")
+    """Convert table_types.rda to table_types.csv."""
+    robjects.r.load("table_types.rda")
     df = robjects.globalenv['table_types']
     with localconverter(robjects.default_converter + pandas2ri.converter):
         table_types_df = robjects.conversion.rpy2py(df)
@@ -24,7 +23,7 @@ def get_tables():
 
 
 def get_api(api_url, token=None):
-    """returns the api response"""
+    """Return the api response."""
     try:
         response = requests.get(api_url,
                                 headers={
@@ -39,12 +38,12 @@ def get_api(api_url, token=None):
 
 
 def get_year_month(date):
-    """returns the year-month of files"""
+    """Return the year-month of files."""
     return datetime.strptime(date, '%Y-%m').date()
 
 
 def get_month_year_urls(date, all_urls, date_type):
-    """returns the urls for files for specificed year-month"""
+    """Return the urls for files for specificed year-month."""
     date_urls = []
     pattern = re.compile('20[0-9]{2}-[0-9]{2}')
     y_m = get_year_month(date)
@@ -61,7 +60,7 @@ def get_month_year_urls(date, all_urls, date_type):
 
 
 def get_all_files(folder_path, dir_name=False):
-    """returns the list of files for a directory"""
+    """Return the list of files for a directory."""
     files = []
     if not os.path.exists(folder_path):
         print(f"{folder_path} does not exits.")
@@ -79,7 +78,7 @@ def get_all_files(folder_path, dir_name=False):
 
 
 def create_temp(dst):
-    """ creates temporary directory"""
+    """Create temporary directory."""
     if not os.path.exists(dst):
         print(f'{dst} does not exists')
         return None
@@ -88,7 +87,7 @@ def create_temp(dst):
 
 
 def copy_zips(src, dst):
-    """ Copies zip files to a temp dir """
+    """Copy zip files to a temp dir."""
     if not os.path.exists(dst):
         os.makedirs(dst)
 
@@ -105,7 +104,7 @@ def copy_zips(src, dst):
 
 
 def copy_zip(src, dst):
-    """ Copies a files to dir """
+    """Copy a files to directory."""
     dir_path, file_name = os.path.split(dst)
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)

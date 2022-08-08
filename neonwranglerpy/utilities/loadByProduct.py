@@ -1,3 +1,4 @@
+"""Download the Files from the NEON API, stacks them and returns dataframe."""
 import os.path
 from tempfile import mkdtemp
 from shutil import rmtree
@@ -17,34 +18,25 @@ def load_by_product(dpID,
                     path='./',
                     save_files=False,
                     stacked_df=False):
-    # if package != "basic" or package != "expanded":
-    #     print(f"{package} is not a valid package name. Package must be basic or expanded")
-    #     return
-
+    """Download the Files from the NEON API, stacks them and returns dataframe."""
     if not match("DP[1-4]{1}.[0-9]{5}.00[0-9]{1}", dpID):
-        return f"{dpID} is not a properly formatted data product ID. The correct format is DP#.#####.00#, " \
-               f"where the first placeholder must be between 1 and 4."
+        return f"{dpID} is not a properly formatted data product ID. The correct format" \
+               f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
 
     if dpID[4:5] == 3 and dpID != "DP1.30012.001":
-        return f'{dpID}, "is a remote sensing data product and cannot be loaded directly to R with this function.Use ' \
-               f'the byFileAOP() or byTileAOP() function to download locally." '
+        return f'{dpID}, "is a remote sensing data product and cannot be loaded ' \
+               f'directly to R with this function.Use the byFileAOP() or ' \
+               f'byTileAOP() function to download locally." '
 
     if len(start_date):
         if not match(DATE_PATTERN, start_date):
-            return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
+            return 'startdate and enddate must be either NA or valid dates in' \
+                   ' the form YYYY-MM'
 
     if len(end_date):
         if not match(DATE_PATTERN, end_date):
-            return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
-
-    args = {
-        "dpID": dpID,
-        "site": site,
-        "start_date": start_date,
-        "end_date": end_date,
-        "package": package,
-        "release": release
-    }
+            return 'startdate and enddate must be either NA or valid dates in' \
+                   ' the form YYYY-MM'
 
     # creates a temp dir.
     tempdir = mkdtemp(dir=os.path.dirname(path))

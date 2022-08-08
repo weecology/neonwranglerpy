@@ -1,10 +1,9 @@
+"""Return the total no. of files , their urls, files names, size."""
 from neonwranglerpy.utilities.tools import get_api
 
 
 def get_zip_urls(month_urls, package, dpID, release, token=None):
-    """
-    returns the total no. of files , their urls, files names, size
-    """
+    """Return the total no. of files , their urls, files names, size."""
     print("finding available files")
     temp = []
     # get all the file names

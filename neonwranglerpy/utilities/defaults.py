@@ -1,5 +1,4 @@
-import os
-
+"""Defaults."""
 from neonwranglerpy._version import __version__
 
 VERSION = __version__
