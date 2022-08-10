@@ -1,9 +1,10 @@
+"""Utilities functions."""
 import pandas as pd
 import re
 
 
 def get_recent_publications(filelist):
-    # TODO : add some checks
+    """Return the most recent version of file from a list of files."""
     pattern = re.compile("[0-9]{8}T[0-9]{6}Z")
     path_dates = []
     for x in filelist:
@@ -13,6 +14,7 @@ def get_recent_publications(filelist):
 
 
 def get_variables(varfile):
+    """Return the table, fieldName, colClass columns from variables files."""
     df = pd.read_csv(varfile)
     df['colClass'] = 'numeric'
     cond = ("string" == df['dataType']) | \

@@ -1,12 +1,11 @@
+"""API defining checkpoint."""
 import os
-from .utilities import *
-from neonwranglerpy.utilities.tools import get_tables
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 def get_data(file):
-    """helper function to get package data"""
+    """Return the path of data file from data directory."""
     return os.path.normpath(os.path.join(_ROOT, 'data', file))
 
 

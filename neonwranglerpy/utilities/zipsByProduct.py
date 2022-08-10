@@ -1,6 +1,5 @@
+"""Download the data files from NEON API."""
 import re
-from tempfile import mkdtemp
-from shutil import rmtree
 import os.path
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
@@ -17,27 +16,29 @@ def zips_by_product(dpID,
                     end_date='',
                     package="basic",
                     release="current",
-                    savepath='.',
+                    savepath='',
                     token=None):
-    # if (package != 'basic') or (package != 'extended'):
-    #     print(f"{package} is not a valid package name. Package must be basic or expanded")
-    #     return
-
-    # TODO: add a check for AOP data product
+    """Download the data files from NEON API."""
+    if dpID[4:5] == 3 and dpID != "DP1.30012.001":
+        return f'{dpID}, "is a remote sensing data product and cannot be loaded' \
+               f'directly to R with this function.Use the byFileAOP() or ' \
+               f'byTileAOP() function to download locally." '
 
     global zip_dir_path
 
     if not re.match("DP[1-4]{1}.[0-9]{5}.00[0-9]{1}", dpID):
-        return f"{dpID} is not a properly formatted data product ID. The correct format is DP#.#####.00#, " \
-               f"where the first placeholder must be between 1 and 4."
+        return f"{dpID} is not a properly formatted data product ID. The correct format" \
+               f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
 
     if len(start_date):
         if not re.match(DATE_PATTERN, start_date):
-            return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
+            return 'startdate and enddate must be either NA or valid dates in the form '\
+                   'YYYY-MM'
 
     if len(end_date):
         if not re.match(DATE_PATTERN, end_date):
-            return 'startdate and enddate must be either NA or valid dates in the form YYYY-MM'
+            return 'startdate and enddate must be either NA or valid dates in the form '\
+                   'YYYY-MM'
 
     if release == 'current':
         api_url = NEON_API_BASE_URL + 'products/' + dpID
@@ -62,8 +63,8 @@ def zips_by_product(dpID,
     if site == 'all':
         month_urls = all_urls
     else:
-        if type(site) == str:
-            package_name = list(site.split(' '))
+        if isinstance(site, str):
+            site = list(site.split(' '))
         for package in site:
             month_site = [x for x in all_urls if re.search(package, x)]
             month_urls.extend(month_site)
@@ -84,27 +85,30 @@ def zips_by_product(dpID,
     if not len(month_urls):
         print("There is no data for selected dates")
 
+    # list of all the urls of the files
     temp = get_zip_urls(month_urls, package, dpID, release, token)
 
     # TODO: calculate download size
     # TODO: user input for downloading or not
-    tempdir = ''
     if not len(savepath):
-        # dir_path = os.path.join(os.getcwd(), f"/filesToStack/{dpID}")
-        tempdir = mkdtemp(dir=os.path.abspath(savepath))
+        savepath = "."
+        tempdir = create_temp(os.path.abspath(savepath))
+        dir_path = os.path.join(tempdir, "filesToStack")
+        os.mkdir(dir_path)
 
     else:
-        tempdir = create_temp(os.path.abspath(savepath))
+        dir_path = os.path.join(savepath, "filesToStack")
+        os.mkdir(dir_path)
 
     # TODO: add progress bar
 
-    if tempdir:
+    if dir_path:
         for zips in temp:
             dirname = '.'.join([
                 'NEON', zips['productCode'], zips['siteCode'], zips['month'],
                 zips['release']
             ])
-            zip_dir_path = os.path.join(tempdir, f'{dirname}')
+            zip_dir_path = os.path.join(dir_path, f'{dirname}')
             os.mkdir(zip_dir_path)
             for file in zips['files']:
                 try:
@@ -114,5 +118,5 @@ def zips_by_product(dpID,
                 except HTTPError as e:
                     print("HTTPError :", e)
                     return None
-
-    return tempdir
+    # returns the path to /filestostack directory
+    return dir_path

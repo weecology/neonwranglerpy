@@ -1,5 +1,5 @@
 import pytest
-from neonwranglerpy import __version__
+from neonwranglerpy.utilities import __version__
 
 
 def test_directory_structure():

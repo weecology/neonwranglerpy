@@ -1,3 +1,4 @@
+"""Argument Parser."""
 import argparse
 from neonwranglerpy.utilities.defaults import VERSION
 

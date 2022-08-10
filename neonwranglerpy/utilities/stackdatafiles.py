@@ -1,3 +1,4 @@
+"""Stack the data files according to table_types."""
 import os.path
 import pandas as pd
 from neonwranglerpy import get_data
@@ -6,7 +7,7 @@ import neonwranglerpy.utilities.utils as ut
 
 
 def load_table_types(dpID: str):
-    """Return the dataframe about the table types of Data Products"""
+    """Return the dataframe about the table types of Data Products."""
     stream = get_data('table_types.csv')
     df = pd.read_csv(stream)
     table_types = df[df['productID'] == dpID]
@@ -14,16 +15,14 @@ def load_table_types(dpID: str):
     return table
 
 
-def stackdatafiles(folder_path, dst, dpID):
-    """ Stack the files"""
-
+def stackdatafiles(folder_path, dst, dpID, stack_df=False):
+    """Stack the data files according to table_types."""
     if not os.path.exists(folder_path):
         print(f"{folder_path} does not exists")
         return None
 
     filenames = tl.get_all_files(folder_path)
     filepaths = tl.get_all_files(folder_path, dir_name=True)
-    file_dict = dict(zip(filenames, filepaths))
     variables_list = [_ for _ in filepaths if "variables.20" in _]
     validation_list = [s for s in filepaths if "validation" in s]
     codes_list = [s for s in filepaths if "categoricalCodes" in s]
@@ -39,7 +38,8 @@ def stackdatafiles(folder_path, dst, dpID):
     tables = table_types[t_filter]
     table_names = tables.tableName
 
-    # copy varibles and validation files to /stackedfiles using the most recent publication date
+    # copy varibles and validation files to /stackedfiles using the most
+    # recent publication date
     if variables_list:
         # get most recent variable file
         varpath = ut.get_recent_publications(variables_list)
@@ -60,12 +60,10 @@ def stackdatafiles(folder_path, dst, dpID):
         codepath = ut.get_recent_publications(codes_list)
         code_dst = os.path.join(stackedpath, f"categoricalCodes_{dpID}.csv")
         tl.copy_zip(codepath, code_dst)
-        print(
-            "copying the most recent publication of categoricalCodes file to /stackedFiles"
-        )
-
+        print("copying the most recent publication of categoricalCodes file to"
+              "/stackedFiles")
+    out = {}
     # stacking the files
-
     for i in range(len(table_names)):
         file_list = [file for file in filepaths if table_names[i] in file]
         file_list.sort()
@@ -77,7 +75,7 @@ def stackdatafiles(folder_path, dst, dpID):
 
         if tables.tableType[i] == "site-all":
             base_files = [os.path.basename(name) for name in file_list]
-            sites = set([s.split(".")[3] for s in base_files])
+            sites = set([s.split(".")[2] for s in base_files])
             for _ in sites:
                 site_list = [s for s in file_list if _ in s]
                 site = ut.get_recent_publications(site_list)
@@ -89,6 +87,12 @@ def stackdatafiles(folder_path, dst, dpID):
 
         stacked_df = pd.concat(stacking_list, axis=0)
         df_save_path = os.path.join(stackedpath, f"{table_names[i]}_{dpID}.csv")
-        stacked_df.to_csv(df_save_path)
 
-    return stackedpath
+        if stack_df:
+            out[table_names[i]] = stacked_df
+        stacked_df.to_csv(df_save_path, index=False)
+
+    out['variables'] = variables
+    out['stackedpath'] = stackedpath
+
+    return out
