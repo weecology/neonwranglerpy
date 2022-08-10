@@ -5,7 +5,6 @@ pandas
 pytest
 pytest-cov
 requests
-rpy2
 sphinx>=3.2.1
 toml
 tox
