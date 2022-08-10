@@ -5,9 +5,12 @@ import os
 import shutil
 from tempfile import mkdtemp
 from datetime import datetime
-import rpy2.robjects as robjects
-from rpy2.robjects.conversion import localconverter
-from rpy2.robjects import pandas2ri
+try:
+    import rpy2.robjects as robjects
+    from rpy2.robjects.conversion import localconverter
+    from rpy2.robjects import pandas2ri
+except ImportError:
+    print('rpy2 needs R')
 
 
 def get_tables():
