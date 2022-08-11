@@ -6,18 +6,22 @@ from neonwranglerpy.utilities.loadByProduct import load_by_product
 from neonwranglerpy.lib.retrieve_coords_itc import retrieve_coords_itc
 
 
-def retrieve_vst_data(
-    dpId="DP1.10098.001",
-    site="all",
-    start_date="",
-    end_date="",
-    method="shp",
-    savepath="",
-    save_files=False,
-    stacked_df=False
-):
+def retrieve_vst_data(dpId="DP1.10098.001",
+                      site="all",
+                      start_date="",
+                      end_date="",
+                      method="shp",
+                      savepath="",
+                      save_files=False,
+                      stacked_df=False):
     """Retrieve Vegetation Structure Data From NEON and Add Individual ID coordinates."""
-    vst = load_by_product(dpId, site, start_date, end_date, path=savepath, save_files=save_files, stacked_df=stacked_df)
+    vst = load_by_product(dpId,
+                          site,
+                          start_date,
+                          end_date,
+                          path=savepath,
+                          save_files=save_files,
+                          stacked_df=stacked_df)
     vst_mappingandtagging = vst["vst_mappingandtagging"]
     vst_apparentindividual = vst["vst_apparentindividual"]
 
@@ -40,6 +44,6 @@ def retrieve_vst_data(
                        on="individualID")
     csv_vst.drop_duplicates(inplace=True)
     if len(savepath):
-        csv_vst.to_csv(os.path.join(vst['stackedpath'], 'vst.csv'),index=False)
+        csv_vst.to_csv(os.path.join(vst['stackedpath'], 'vst.csv'), index=False)
 
     return dict([('vst', csv_vst), ('raw_dat', vst)])
