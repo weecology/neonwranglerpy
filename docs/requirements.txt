@@ -1,13 +1,12 @@
-# Requirements file for ReadTheDocs, check .readthedocs.yml.
-# To build the module reference correctly, make sure every external package
-# under `install_requires` in `setup.cfg` is also listed here!
-sphinx>=3.2.1
+
 # sphinx_rtd_theme
-pytest-cov
+flake8-docstrings
+pandas
 pytest
-yapf
-toml
+pytest-cov
 requests
 rpy2
-pandas
-flake8-docstrings
+sphinx>=3.2.1
+toml
+tox
+yapf
