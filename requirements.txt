@@ -1,9 +1,9 @@
-pytest-cov
+flake8-docstrings
+pandas
 pytest
-yapf
-toml
+pytest-cov
 requests
 rpy2
-pandas
-flake8-docstrings
+toml
 tox
+yapf
