@@ -6,4 +6,3 @@ requests
 rpy2
 pandas
 flake8-docstrings
-tox
