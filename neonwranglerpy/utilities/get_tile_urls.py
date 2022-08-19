@@ -1,16 +1,21 @@
-"""Get tile_urls, size, name"""
+"""Get tile_urls, size, name."""
 
 from neonwranglerpy.utilities.tools import get_api
 
 
-def get_tile_urls(month_url, easting, northing, ):
-    """Get tile urls"""
+def get_tile_urls(
+    month_url,
+    easting,
+    northing,
+):
+    """Get tile urls."""
     file_urls = []
     for i in range(len(month_url)):
         temp = get_api(month_url[i]).json()
 
         if not len(temp):
-            print(f"No files found for site {temp['data']['siteCode']} and year {temp['data']['month']}.")
+            print(f"No files found for site {temp['data']['siteCode']} and "
+                  f"year {temp['data']['month']}.")
             continue
 
         temp_ = temp['data']['files']
