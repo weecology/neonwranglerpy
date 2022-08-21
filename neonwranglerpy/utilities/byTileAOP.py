@@ -4,10 +4,20 @@ import os
 import re
 from urllib.error import HTTPError
 from urllib.request import urlretrieve
+import pandas as pd
 
+from neonwranglerpy import get_data
 from neonwranglerpy.utilities.tools import get_api
 from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
 from neonwranglerpy.utilities.get_tile_urls import get_tile_urls
+
+
+def load_shared_flights():
+    """Return the dataframe about the table types of Data Products."""
+    stream = get_data('shared_flights.csv')
+    df = pd.read_csv(stream)
+    df.reset_index(drop=True, inplace=True)
+    return df
 
 
 def by_tile_aop(dpID, site, year, easting, northing, savepath=None):
@@ -24,6 +34,16 @@ def by_tile_aop(dpID, site, year, easting, northing, savepath=None):
     response = get_api(api_url).json()
     all_urls = []
     # TODO: check for product not found
+
+    # check for shared sites
+    shared_flights = load_shared_flights()
+    flight_site = shared_flights['site'].str.contains(site)
+
+    if flight_site.any():
+        flight_site = shared_flights['flightSite'][flight_site].item()
+        site = flight_site
+        print(f'{site} is part of shared flights, changing the {site} to {flight_site}')
+
     for i in range(len(response['data']['siteCodes'])):
         if response['data']['siteCodes'][i]['siteCode'] == site:
             all_urls = response['data']['siteCodes'][i]['availableDataUrls']

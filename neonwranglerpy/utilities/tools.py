@@ -16,14 +16,15 @@ except ImportError:
 
 def rda2csv(file_name):
     """Convert table_types.rda to table_types.csv."""
-    file_path = get_data(file_name+'.rda')
+    file_path = get_data(file_name + '.rda')
     robjects.r.load(file_path)
     _df = robjects.globalenv[f'{file_name}']
     with localconverter(robjects.default_converter + pandas2ri.converter):
         df = robjects.conversion.rpy2py(_df)
-    df.to_csv(f'neonwranglerpy/data/{file_name}.csv',
-                          index=False,
-                          )
+    df.to_csv(
+        f'neonwranglerpy/data/{file_name}.csv',
+        index=False,
+    )
     return df
 
 
