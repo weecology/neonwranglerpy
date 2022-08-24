@@ -3,7 +3,7 @@ import re
 import os.path
 from urllib.request import urlretrieve
 from urllib.error import HTTPError
-from neonwranglerpy.utilities.tools import get_api, get_month_year_urls, create_temp
+from neonwranglerpy.utilities.tools import get_api, get_month_year_urls
 from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
 from neonwranglerpy.utilities.getzipurls import get_zip_urls
 
@@ -54,7 +54,7 @@ def zips_by_product(dpID,
     str
         The path to /filestostack directory
     """
-    if dpID[4:5] == 3 and dpID != "DP1.30012.001":
+    if dpID[4:5] == '3' and dpID != "DP1.30012.001":
         return f'{dpID}, "is a remote sensing data product and cannot be loaded' \
                f'directly to R with this function.Use the byFileAOP() or ' \
                f'byTileAOP() function to download locally." '
@@ -72,7 +72,7 @@ def zips_by_product(dpID,
 
     if len(end_date):
         if not re.match(DATE_PATTERN, end_date):
-            return 'startdate and enddate must be either NA or valid dates in the form '\
+            return 'startdate and enddate must be either NA or valid dates in the form ' \
                    'YYYY-MM'
 
     if release == 'current':
@@ -125,25 +125,26 @@ def zips_by_product(dpID,
 
     # TODO: calculate download size
     # TODO: user input for downloading or not
-    if not len(savepath):
-        savepath = "."
-        tempdir = create_temp(os.path.abspath(savepath))
-        dir_path = os.path.join(tempdir, "filesToStack")
-        os.mkdir(dir_path)
-
+    if not savepath:
+        savepath = os.path.normpath(os.path.join(os.getcwd(), dpID))
     else:
-        dir_path = os.path.join(savepath, "filesToStack")
-        os.mkdir(dir_path)
+        savepath = os.path.normpath(os.path.join(savepath, dpID))
+
+    if not os.path.isdir(savepath):
+        os.makedirs(savepath)
+
+    files_to_stack_path = os.path.join(savepath, "filesToStack")
+    os.mkdir(files_to_stack_path)
 
     # TODO: add progress bar
 
-    if dir_path:
+    if files_to_stack_path:
         for zips in temp:
             dirname = '.'.join([
                 'NEON', zips['productCode'], zips['siteCode'], zips['month'],
                 zips['release']
             ])
-            zip_dir_path = os.path.join(dir_path, f'{dirname}')
+            zip_dir_path = os.path.join(files_to_stack_path, f'{dirname}')
             os.mkdir(zip_dir_path)
             for file in zips['files']:
                 try:
@@ -154,4 +155,4 @@ def zips_by_product(dpID,
                     print("HTTPError :", e)
                     return None
     # returns the path to /filestostack directory
-    return dir_path
+    return files_to_stack_path

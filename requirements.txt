@@ -1,4 +1,5 @@
 flake8-docstrings
+geopandas
 pandas
 pytest
 pytest-cov

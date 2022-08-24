@@ -1,6 +1,5 @@
 """Download the Files from the NEON API, stacks them and returns dataframe."""
 import os.path
-from tempfile import mkdtemp
 from shutil import rmtree
 from re import match, compile
 from neonwranglerpy.utilities.zipsByProduct import zips_by_product
@@ -68,7 +67,7 @@ def load_by_product(dpID,
         return f"{dpID} is not a properly formatted data product ID. The correct format" \
                f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
 
-    if dpID[4:5] == 3 and dpID != "DP1.30012.001":
+    if dpID[4:5] == '3' and dpID != "DP1.30012.001":
         return f'{dpID}, "is a remote sensing data product and cannot be loaded ' \
                f'directly to R with this function.Use the byFileAOP() or ' \
                f'byTileAOP() function to download locally." '
@@ -84,19 +83,23 @@ def load_by_product(dpID,
                    ' the form YYYY-MM'
 
     # creates a temp dir.
-    tempdir = mkdtemp(dir=os.path.dirname(path))
+    # tempdir = mkdtemp(dir=os.path.dirname(path))
 
+    if not path:
+        savepath = os.path.normpath(os.path.join(os.getcwd()))
+    else:
+        savepath = os.path.normpath(path)
+
+    if not os.path.isdir(savepath):
+        print(f"{path} doesn't exist")
+        return
     # pass the request to zipsByProduct() to download
-    path = zips_by_product(dpID,
-                           site,
-                           start_date,
-                           end_date,
-                           package,
-                           release,
-                           savepath=tempdir)
+    files_to_stack_path = zips_by_product(dpID, site, start_date, end_date, package,
+                                          release, savepath)
     # stack the tables by using stackByTable\
-    out = stack_by_table(filepath=path, dpID=dpID, savepath=tempdir, stack_df=stacked_df)
+    savepath = os.path.join(savepath, dpID)
+    out = stack_by_table(files_to_stack_path, savepath, dpID, stack_df=stacked_df)
     # removes temp dir
     if not save_files:
-        rmtree(tempdir)
+        rmtree(savepath)
     return out
