@@ -21,7 +21,7 @@ def load_shared_flights():
     return df
 
 
-def by_tile_aop(dpID, site, year, easting, northing, savepath=None):
+def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     """Download the AOP data for given tiles coordinates.
 
     Parameters:
@@ -44,14 +44,13 @@ def by_tile_aop(dpID, site, year, easting, northing, savepath=None):
 
     savepath : str, optional
         The full path to the folder in which the files would be placed locally.
+
+    buffer : int
+        The buffer around cooordinates to be taken while downloading the tiles.
     """
     if not re.match("DP[1-4]{1}.[0-9]{5}.00[0-9]{1}", dpID):
         return f"{dpID} is not a properly formatted data product ID. The correct format" \
                f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
-
-    # TODO: convert to int if dataframe
-    # easting = int(easting)
-    # northing = int(northing)
 
     api_url = NEON_API_BASE_URL + 'products/' + dpID
     response = get_api(api_url).json()
@@ -76,6 +75,9 @@ def by_tile_aop(dpID, site, year, easting, northing, savepath=None):
     if not len(month_urls):
         print(f"There is no data for site {site} and year {year}")
 
+    if isinstance(easting, (int, float)):
+        easting = [easting]
+        northing = [northing]
     # convert the easting and northing for BLAN site
     if site == "BLAN":
         if isinstance(easting, (int, list)):
@@ -88,21 +90,28 @@ def by_tile_aop(dpID, site, year, easting, northing, savepath=None):
             # df17N dataframe
             df17N_easting = easting.loc[df17N_mask['easting']].reset_index(drop=True)
             df17N_northing = northing.loc[df17N_mask['easting']].reset_index(drop=True)
-            df17N = pd.concat([df17N_easting, df17N_northing], axis=1).reset_index(drop=True)
+            df17N = pd.concat([df17N_easting, df17N_northing],
+                              axis=1).reset_index(drop=True)
             df17N.columns = ['easting', 'northing']
 
             # df18N dataframe
             df18N_easting = easting.loc[df18N_mask['easting']].reset_index(drop=True)
             df18N_northing = northing.loc[df18N_mask['easting']].reset_index(drop=True)
-            df18N = pd.concat([df18N_easting, df18N_northing], axis=1).reset_index(drop=True)
+            df18N = pd.concat([df18N_easting, df18N_northing],
+                              axis=1).reset_index(drop=True)
             df18N.columns = ['easting', 'northing']
 
             # convert the 18N to 17N
-            gdf18N = gpd.GeoDataFrame(df18N, geometry=gpd.points_from_xy(df18N.easting, df18N.northing), crs=32618)
+            gdf18N = gpd.GeoDataFrame(df18N,
+                                      geometry=gpd.points_from_xy(
+                                          df18N.easting, df18N.northing),
+                                      crs=32618)
             df18N_in17nm = gdf18N.to_crs(32617)
 
             # update the easting and northing for 18N with 17N
-            df18N_in17nm = pd.concat([df18N_in17nm['geometry'].x, df18N_in17nm['geometry'].y], axis=1).reset_index(drop=True)
+            df18N_in17nm = pd.concat(
+                [df18N_in17nm['geometry'].x, df18N_in17nm['geometry'].y],
+                axis=1).reset_index(drop=True)
             df18N_in17nm.columns = ['easting', 'northing']
 
             # append df18N and df17N
