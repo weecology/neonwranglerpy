@@ -14,12 +14,12 @@ def load_plots():
 def retrieve_coords_itc(dat):
     """Calculate the coordinates for each individual tree in the vegetation structure.
 
-    Parameters:
+    Parameters
     ----------
     dat : pandas.DataFrame
         The mapping and tagging dataframe from Vegetation Structure Data.
 
-    Returns:
+    Returns
     -------
     field_tag : pandas.DataFrame
         Dataframe with the coordinates for each individual tree in the vegetation

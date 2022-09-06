@@ -18,7 +18,42 @@ def zips_by_product(dpID,
                     release="current",
                     savepath='',
                     token=None):
-    """Download the data files from NEON API."""
+    """Download the data files from NEON API.
+
+    Parameters
+    ------------
+    dpID: str
+        The NEON Data Product ID to be downloaded, in the form DPL.PRNUM.REV
+        e.g. DP1.10098.001.
+
+    site : str, list, optional
+        The 4 Letter NEON site code for NEON sites or 'all' for data from all sites
+        e.g. DELA, ['DELA','ABBY'].
+
+    start_date : str, optional
+        Date to search data in the form YYYY-MM or None for all available dates,
+        e.g. 2017-01.
+
+    end_date : str, optional
+        Date to search data in the form YYYY-MM or None for all available dates,
+        e.g. 2017-01.
+
+    package : str, optional
+        Indicating which data package to download, either 'basic' or 'expanded'.
+
+    release : str, optional
+        The data release to be downloaded; either 'current' or the name of a release,
+        e.g. 'RELEASE-2021'.
+
+    savepath : str, optional
+        The full path to the folder in which the files would be placed locally.
+
+
+    Returns
+    --------
+    str
+        The path to /filestostack directory
+    """
     if dpID[4:5] == 3 and dpID != "DP1.30012.001":
         return f'{dpID}, "is a remote sensing data product and cannot be loaded' \
                f'directly to R with this function.Use the byFileAOP() or ' \

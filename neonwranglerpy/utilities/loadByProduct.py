@@ -17,8 +17,53 @@ def load_by_product(dpID,
                     release="current",
                     path='./',
                     save_files=False,
-                    stacked_df=False):
-    """Download the Files from the NEON API, stacks them and returns dataframe."""
+                    stacked_df=True):
+    """Download the Files from the NEON API, stacks them and returns dataframe.
+
+    Parameters
+    ------------
+    dpID: str
+        The NEON Data Product ID to be downloaded, in the form DPL.PRNUM.REV
+        e.g. DP1.10098.001.
+
+    site : str, list, optional
+        The 4 Letter NEON site code for NEON sites or 'all' for data from all sites
+        e.g. DELA, ['DELA','ABBY'].
+
+    start_date : str, optional
+        Date to search data in the form YYYY-MM or None for all available dates,
+        e.g. 2017-01.
+
+    end_date : str, optional
+        Date to search data in the form YYYY-MM or None for all available dates,
+        e.g. 2017-01.
+
+    package : str, optional
+        Indicating which data package to download, either 'basic' or 'expanded'.
+
+    release : str, optional
+        The data release to be downloaded; either 'current' or the name of a release,
+        e.g. 'RELEASE-2021'.
+
+    path : str, optional
+        The full path to the folder in which the files would be placed locally.
+
+    save_files : bool, optional
+        Whether to save the downloaded files after downloading them.
+
+    stacked_df: str, optional
+        Whether to return the stacked dataframes after stacking the files.
+
+    Returns
+    --------
+    dict
+        A Python dictionary having stacked dataframes and path of saved files
+        e.g.
+        ``{
+        'vst_mappingandtagging' : pandas.DataFrame,
+        'stackedpath' : '/test/vst.csv'
+        }``
+    """
     if not match("DP[1-4]{1}.[0-9]{5}.00[0-9]{1}", dpID):
         return f"{dpID} is not a properly formatted data product ID. The correct format" \
                f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."

@@ -11,8 +11,39 @@ def stack_by_table(filepath="filesTostack",
                    savepath=".",
                    dpID=None,
                    package=None,
-                   stack_df=False):
-    """Stack the table."""
+                   stack_df=True):
+    """Stack the table.
+
+    Parameters
+    ------------
+    filepath : str, optional
+        The full path of downloaded files.
+
+    savepath : str, optional
+        The full path to the folder in which the files would be placed locally.
+
+    dpID: str
+        The NEON Data Product ID to be downloaded, in the form DPL.PRNUM.REV
+        e.g. DP1.10098.001.
+
+    package : str, optional
+        Indicating which data package to download, either 'basic' or 'expanded'.
+
+    save_files : bool, optional
+        Whether to save the downloaded files after downloading them.
+
+    stack_df: str, optional
+        Whether to return the stacked dataframes after stacking the files.
+    Returns
+    --------
+    dict
+        A Python dictionary having stacked dataframes and path of saved files
+        e.g.
+        ``{
+        'vst_mappingandtagging' : pandas.DataFrame,
+        'stackedpath' : '/test/vst.csv'
+        }``
+    """
     if not path.exists(filepath):
         return f"{filepath} doesn't exists "
 
