@@ -55,7 +55,9 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     api_url = NEON_API_BASE_URL + 'products/' + dpID
     response = get_api(api_url).json()
     all_urls = []
-    # TODO: check for product not found
+
+    if 'error' in response:
+        return f"status: {response['error']['status'], {response['error']['detail']}}"
 
     # check for shared sites
     shared_flights = load_shared_flights()
@@ -118,7 +120,6 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
             _df = pd.concat([df18N_in17nm, df17N])
             easting, northing = _df.easting, _df.northing
 
-    # TODO : use vectorized operation instead
     tile_easting = [math.floor(float(x / 1000)) * 1000 for x in easting]
     tile_northing = [math.floor(float(x / 1000)) * 1000 for x in northing]
     file_urls = get_tile_urls(month_urls, tile_easting, tile_northing)
@@ -131,7 +132,6 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     if not os.path.isdir(savepath):
         os.makedirs(savepath)
 
-    # TODO: progress bar
     for i in range(len(file_urls)):
         split_path = file_urls[i]['url'].split('/')
         dir_path = '/'.join(split_path[4:len(split_path) - 1])

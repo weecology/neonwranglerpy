@@ -79,13 +79,14 @@ def zips_by_product(dpID,
         api_url = NEON_API_BASE_URL + 'products/' + dpID
         product_req = get_api(api_url, token)
     else:
-        api_url = NEON_API_BASE_URL + 'products/' + dpID + '?release' + release
+        api_url = NEON_API_BASE_URL + 'products/' + str(dpID) + '?release' + str(release)
         product_req = get_api(api_url, token).json()
 
     api_response = product_req.json()
 
-    # if api_response['error']['status']:
-    #     print('No data found for product')
+    if 'error' in api_response:
+        return f"status: {api_response['error']['status']},"
+        f" {api_response['error']['detail']}"
 
     # TODO: check for rate-limit
 
