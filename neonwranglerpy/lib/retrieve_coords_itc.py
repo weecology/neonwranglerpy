@@ -12,7 +12,20 @@ def load_plots():
 
 
 def retrieve_coords_itc(dat):
-    """Calcualte the coordinates for each individual tree in the vegetation structure."""
+    """Calculate the coordinates for each individual tree in the vegetation structure.
+
+    Parameters
+    ----------
+    dat : pandas.DataFrame
+        The mapping and tagging dataframe from Vegetation Structure Data.
+
+    Returns
+    -------
+    field_tag : pandas.DataFrame
+        Dataframe with the coordinates for each individual tree in the vegetation
+        Structure, i.e. columns named as itcEasting and itcNorthing.
+
+    """
     # getting the vst columns from ALL NEON TOS Plots
     plots = load_plots()
     vst_rows = list(plots['appMods'].str.contains('vst'))

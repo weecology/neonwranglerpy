@@ -1,5 +1,5 @@
 =======================================
-New repo for the neonwranglerpy package
+neonwranglerpy
 =======================================
 
 .. image:: https://github.com/weecology/neonwranglerpy/actions/workflows/python-package.yml/badge.svg
@@ -14,4 +14,31 @@ New repo for the neonwranglerpy package
    :target: https://raw.githubusercontent.com/weecology/neonwranglerpy/main/LICENSE
    :alt: License
 
-The ...
+A Python Implementation of `NeonVegWrangleR`_ package, for integrating the Neon Vegetation Structure (VST) and Airborne Observation Platform (AOP) Data.
+
+Installing the Current Release
+------------------------------
+
+If you have Python installed you can install the current release using either pip: ::
+
+   pip install neonwranglerpy
+
+
+Installing the package from source
+----------------------------------
+
+1. Get the latest source by cloning this repo: ::
+
+      git clone https://github.com/weecology/neonwranglerpy.git
+
+2. Install the dependencies: ::
+
+      pip install -r requirements.txt
+
+3. Install neonwranglerpy: ::
+
+      pip install .
+
+
+.. _NeonVegWrangleR : https://github.com/weecology/neonVegWrangleR
+
