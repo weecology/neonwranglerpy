@@ -109,7 +109,6 @@ def test_load_by_product(test_name, dpID, site, start_date, end_date, args, expe
                                  path=path,
                                  save_files=save_files,
                                  stacked_df=stacked_df)
-    print(data_frame.keys())
     columns_values = list(data_frame['vst_mappingandtagging'].dtypes.index)
     first_row_data = list(data_frame['vst_mappingandtagging'].fillna(0).iloc[0])
 
