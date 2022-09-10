@@ -6,3 +6,5 @@ include neonwranglerpy/data/All_NEON_TOS_Plots_Points_V9.prj
 include neonwranglerpy/data/All_NEON_TOS_Plots_Points_V9.shp.xml
 include neonwranglerpy/data/All_NEON_TOS_Plots_Points_V9.shx
 include neonwranglerpy/data/table_types.csv
+include neonwranglerpy/data/shared_flights.csv
+
