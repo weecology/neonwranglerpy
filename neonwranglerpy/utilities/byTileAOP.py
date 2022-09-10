@@ -24,7 +24,7 @@ def load_shared_flights():
 def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     """Download the AOP data for given tiles coordinates.
 
-    Parameters:
+    Parameters
     ----------
     dpID: str
         The NEON Data Product ID to be downloaded, in the form DPL.PRNUM.REV
