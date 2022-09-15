@@ -8,3 +8,4 @@ rpy2
 toml
 tox
 yapf
+sphinx-press-theme
