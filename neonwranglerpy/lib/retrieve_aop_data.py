@@ -40,6 +40,8 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
         if which_easting.any:
             tiles.loc[which_cheq, "siteID"] = 'CHEQ'
             tiles.drop_duplicates(inplace=True)
+    if isinstance(dpID, str):
+        dpID = [dpID]
 
     for i in range(tiles.shape[0]):
         for prd in dpID:
