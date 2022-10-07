@@ -27,9 +27,8 @@ def crop_data_to_plot(plt,
 
     plots = plots.groupby(['plotID', 'subplotID', 'siteID',
                            'utmZone']).mean().reset_index()
-    plots = plots.drop_duplicates(
-        subset=['siteID', 'plotID', 'subplotID', 'utmZone', 'easting', 'northing'
-               ]).reset_index(drop=True)
+    drop_subset = ['siteID', 'plotID', 'subplotID', 'utmZone', 'easting', 'northing']
+    plots = plots.drop_duplicates(subset=drop_subset).reset_index(drop=True)
     plots.dropna(axis=0, how='any', inplace=True)
     plots['plt_e'] = (plots[['easting']] / 1000).astype(int) * 1000
     plots['plt_n'] = (plots[['northing']] / 1000).astype(int) * 1000
