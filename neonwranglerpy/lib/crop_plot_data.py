@@ -3,6 +3,8 @@ from glob import glob
 import pandas as pd
 import numpy as np
 
+from neonwranglerpy.lib.clip_plot import clip_plot
+
 
 def list_files(path):
     """List all the files in a path of given format."""
@@ -23,6 +25,7 @@ def crop_data_to_plot(plt,
     files = [file for file in full_files if dpID in file]
     files = [file for file in files if str(target_year) in file]
 
+    # TODO: add check if files for targeted year and product is not present
     plots = plt[['plotID', 'subplotID', 'siteID', 'utmZone', 'easting', 'northing']]
 
     plots = plots.groupby(['plotID', 'subplotID', 'siteID',
@@ -71,8 +74,9 @@ def crop_data_to_plot(plt,
     plots = pd.concat([plots, tile_ep, tile_em, tile_np, tile_nm]).reset_index(drop=True)
     # list_data = [site for site in plots['siteID'].unique().tolist() if site in files]
     files_list = []
-    for site in plots['siteID'].unique().tolist():
+    sites = plots['siteID'].unique().tolist()
+    for site in sites:
         list_data = [file for file in files if site in file]
         files_list.extend(list_data)
 
-    # plots = plots.apply(lambda p: clip_plot(p), axis=1, result_type='expand')
+    plots = plots.apply(lambda p: clip_plot(p, list_data), axis=1, result_type='expand')
