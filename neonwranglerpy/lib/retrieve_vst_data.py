@@ -75,7 +75,7 @@ def retrieve_vst_data(dpId="DP1.10098.001",
                        how="left",
                        on="individualID")
     csv_vst.drop_duplicates(inplace=True)
-    if len(savepath):
+    if save_files:
         csv_vst.to_csv(os.path.join(vst['stackedpath'], 'vst.csv'), index=False)
 
     return dict([('vst', csv_vst), ('raw_dat', vst)])
