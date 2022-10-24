@@ -32,15 +32,14 @@ def retrieve_coords_itc(dat):
     plots_df = plots.loc[vst_rows]
 
     convert_dict = {
-        'pointID': 'string',
+        'pointID': str,
     }
-    # converting the pointID dtype from float to character
-    plots_df = plots_df.astype({'pointID': 'Int64'}).astype(convert_dict)
-    data = dat.astype({'pointID': 'Int64'}).astype(convert_dict)
+    # converting the pointID dtype from string to float64
+    plots_df = plots_df.astype({'pointID': 'float64'})
 
-    vst_df = data.merge(plots_df, how='inner', on=['plotID', 'pointID', 'siteID'])
+    vst_df = dat.merge(plots_df, how='inner', on=['plotID', 'pointID', 'siteID'])
+    vst_df = vst_df.astype(convert_dict)
     na_values = vst_df['stemAzimuth'].isnull().values.any()
-
     if na_values:
         print(
             f"{len(na_values)} entries could not be georeferenced and will be discarded.")
