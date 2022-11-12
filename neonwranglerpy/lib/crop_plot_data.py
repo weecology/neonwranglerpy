@@ -1,4 +1,5 @@
 """Create a shapefile out of vegetation structure data with lat/lon coordinates."""
+import os
 from glob import glob
 import pandas as pd
 import numpy as np
@@ -8,20 +9,22 @@ from neonwranglerpy.lib.clip_plot import clip_plot
 
 def list_files(path):
     """List all the files in a path of given format."""
-    mask = path + '**/*.[th][i5][f ]'
+    mask = path + '/**/*.[th][i5]'
     files = glob(mask, recursive=True)
     return files
 
 
 def crop_data_to_plot(plt,
                       dpID='DP3.30006.001',
-                      path="",
+                      dataset_path="",
                       target_year=2018,
                       bff=520,
                       tasks=1,
-                      parallelized=False):
+                      parallelized=False,
+                      savepath=""):
     """Create shapefiles out of a vegetation structure data with lat/lon coordinates."""
-    full_files = list_files(path)
+    dataset_path = os.path.normpath(dataset_path)
+    full_files = list_files(dataset_path)
     files = [file for file in full_files if dpID in file]
     files = [file for file in files if str(target_year) in file]
 
@@ -79,4 +82,4 @@ def crop_data_to_plot(plt,
         list_data = [file for file in files if site in file]
         files_list.extend(list_data)
 
-    plots = plots.apply(lambda p: clip_plot(p, list_data), axis=1, result_type='expand')
+    plots = plots.apply(lambda p: clip_plot(p, list_data,savepath=savepath), axis=1, result_type='expand')
