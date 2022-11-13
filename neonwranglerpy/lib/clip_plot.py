@@ -1,7 +1,7 @@
 """Clip Plots around NEON vegetation structure."""
 import os
 from neonwranglerpy.lib.clip_raster import clip_raster
-
+from neonwranglerpy.lib.extract_hsi_to_tif import generate_raster
 
 def clip_plot(plt, list_data, bff=12, savepath=""):
     """Clip Plots around Vegetation Structure."""
@@ -14,15 +14,23 @@ def clip_plot(plt, list_data, bff=12, savepath=""):
     missed_plots = []
 
     for tile in tiles:
+        # tile == "file_path"
         try:
             file_args = tile.split(sep='/FullSite')[1]
             file_args = file_args.split(sep='/')
             # year = file_args[1].split("_")[0]
 
+            file_name = os.path.basename(tile)
+
             if ".tif" in file_args[-1]:
                 # site = file_args[1].split('_')[1]
-                file_name = os.path.basename(tile)
-                savepath = os.path.join(savepath, file_name)
-                clip_raster(plt, tile, bff, savepath)
-        except Exception:
+                tif_path = os.path.join(savepath, file_name)
+                clip_raster(plt, tile, bff, tif_path)
+
+            if ".h5" in file_args[-1]:
+                _tile = file_name.split(".")[0]
+                generate_raster(tile, savepath, _tile)
+
+        except Exception as e:
+            print(e)
             missed_plots.append(tile)
