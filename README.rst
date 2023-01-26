@@ -21,7 +21,7 @@ Installing the Current Release
 
 If you have Python installed you can install the current release using either pip: ::
 
-   pip install neonwranglerpy
+   pip install git+https://github.com/weecology/neonwranglerpy.git
 
 
 Installing the package from source
