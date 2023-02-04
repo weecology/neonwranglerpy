@@ -1,4 +1,3 @@
-import pylas
 import laspy
 import numpy as np
 # data_path = "/home/smarconi/Downloads/NEON_D03_OSBS_DP1_400000_3280000_classified_point_cloud_colorized.laz"
