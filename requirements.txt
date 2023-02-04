@@ -9,3 +9,4 @@ toml
 tox
 yapf
 sphinx-press-theme
+laspy[lazrs]
