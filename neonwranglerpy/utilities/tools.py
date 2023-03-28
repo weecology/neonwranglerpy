@@ -6,26 +6,6 @@ import shutil
 from tempfile import mkdtemp
 from datetime import datetime
 from neonwranglerpy import get_data
-try:
-    import rpy2.robjects as robjects
-    from rpy2.robjects.conversion import localconverter
-    from rpy2.robjects import pandas2ri
-except ImportError:
-    print('rpy2 needs R')
-
-
-def rda2csv(file_name):
-    """Convert table_types.rda to table_types.csv."""
-    file_path = get_data(file_name + '.rda')
-    robjects.r.load(file_path)
-    _df = robjects.globalenv[f'{file_name}']
-    with localconverter(robjects.default_converter + pandas2ri.converter):
-        df = robjects.conversion.rpy2py(_df)
-    df.to_csv(
-        f'neonwranglerpy/data/{file_name}.csv',
-        index=False,
-    )
-    return df
 
 
 def get_api(api_url, token=None):

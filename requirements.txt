@@ -4,7 +4,6 @@ pandas
 pytest
 pytest-cov
 requests
-rpy2
 toml
 tox
 yapf
