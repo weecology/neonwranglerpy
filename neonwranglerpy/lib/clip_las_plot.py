@@ -11,6 +11,7 @@ def clip_las_plot(plt, data_path, buffer, savepath):
     buffer = the buffer around the center of the plot (plot size divided by 2)
     savepath =  full path where to store the clipped laz file.
     """
+
     # open the NEON las tile
     las = laspy.read(data_path)
     # builds the bounding box with center (easting, northing)
