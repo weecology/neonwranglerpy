@@ -171,14 +171,14 @@ def array2raster(newRaster, reflBandArray, reflArray_metadata, extent, ras_dir,
     transform = Affine.translation(originX, originY) * Affine.scale(res, -res)
     with rasterio.open(
         "{}/{}".format(ras_dir, newRaster),
-         'w',
-         driver='GTiff',
-         height=rows,
-         width=cols,
-         count=bands,
-         dtype=reflBandArray.dtype,
-         crs=rasterio.crs.CRS.from_dict(init='epsg:'+str(reflArray_metadata["epsg"])),
-         transform=transform,) as dst:
+        'w',
+        driver='GTiff',
+        height=rows,
+        width=cols,
+        count=bands,
+        dtype=reflBandArray.dtype,
+        crs=rasterio.crs.CRS.from_dict(init='epsg:' + str(reflArray_metadata["epsg"])),
+            transform=transform,) as dst:
         dst.write(reflBandArray)
     return (reflBandArray)
 
