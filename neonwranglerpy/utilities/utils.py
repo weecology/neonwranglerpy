@@ -16,13 +16,11 @@ def get_recent_publications(filelist):
 def get_variables(varfile):
     """Return the table, fieldName, colClass columns from variables files."""
     df = pd.read_csv(varfile)
-    df['colClass'] = 'numeric'
-    cond = ("string" == df['dataType']) | \
-           ("date" == df['dataType']) | \
-           ("dateTime" == df['dataType']) | \
-           ("uri" == df['dataType'])
-    df['colClass'].mask(cond, 'character', inplace=True)
+    df["colClass"] = "numeric"
+    cond = (("string" == df["dataType"]) | ("date" == df["dataType"]) |
+            ("dateTime" == df["dataType"]) | ("uri" == df["dataType"]))
+    df["colClass"].mask(cond, "character", inplace=True)
 
-    if 'table' in df.columns:
-        return df[['table', 'fieldName', 'colClass']]
-    return df[['fieldName', 'colClass']]
+    if "table" in df.columns:
+        return df[["table", "fieldName", "colClass"]]
+    return df[["fieldName", "colClass"]]

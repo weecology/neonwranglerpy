@@ -1,16 +1,16 @@
 """Tools for clipping the Data."""
+import geopandas as gpd
 import json
 import rasterio as rio
+from fiona.crs import from_epsg
 from rasterio.mask import mask
 from shapely.geometry import box
-import geopandas as gpd
-from fiona.crs import from_epsg
 
 
 def clip_raster(plt, data_path, buffer, savepath):
     """Clips the Raster Data for given plot."""
     # builds the bounding box with center (easting, northing)
-    center_x, center_y = plt['easting'], plt['northing']
+    center_x, center_y = plt["easting"], plt["northing"]
     bbox = make_bbox(center_x, center_y, buffer)
     # read raster data
     dat = rio.open(data_path)
@@ -40,12 +40,12 @@ def mask_raster(raster_data, bbox):
     bbox : shapely.geometry.polygon.Polygon
 
     """
-    epsg = int(raster_data.crs.data['init'][5:])
+    epsg = int(raster_data.crs.data["init"][5:])
     crs = raster_data.crs
-    geo = gpd.GeoDataFrame({'geometry': bbox}, index=[0], crs=from_epsg(epsg)['init'])
-    geo = geo.to_crs(crs=crs.data['init'])
+    geo = gpd.GeoDataFrame({"geometry": bbox}, index=[0], crs=from_epsg(epsg)["init"])
+    geo = geo.to_crs(crs=crs.data["init"])
 
-    coords = [json.loads(geo.to_json())['features'][0]['geometry']]
+    coords = [json.loads(geo.to_json())["features"][0]["geometry"]]
     out_img, out_transform = mask(dataset=raster_data, shapes=coords, crop=True)
     out_meta = raster_data.meta.copy()
     out_meta.update({
@@ -53,6 +53,6 @@ def mask_raster(raster_data, bbox):
         "height": out_img.shape[1],
         "width": out_img.shape[2],
         "transform": out_transform,
-        "crs": crs
+        "crs": crs,
     })
     return out_img, out_meta

@@ -2,7 +2,7 @@
 from neonwranglerpy.utilities.byTileAOP import by_tile_aop
 
 
-def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
+def retrieve_aop_data(data, year=2019, dpID=["DP3.30006.001"], savepath=""):
     """Download AOP data around vst data for specified year, site.
 
     Parameters
@@ -22,23 +22,23 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
         The full path to the folder in which the files would be placed locally.
     """
     coords_for_tiles = data[[
-        'plotID', 'siteID', 'utmZone', 'easting', 'northing', 'date'
+        "plotID", "siteID", "utmZone", "easting", "northing", "date"
     ]]
     # get tiles dimensions
-    coords_for_tiles['easting'] = (coords_for_tiles[['easting']] / 1000) * 1000
-    coords_for_tiles['northing'] = (coords_for_tiles[['northing']] / 1000) * 1000
+    coords_for_tiles["easting"] = (coords_for_tiles[["easting"]] / 1000) * 1000
+    coords_for_tiles["northing"] = (coords_for_tiles[["northing"]] / 1000) * 1000
 
     # drop duplicates values
     tiles = coords_for_tiles.drop_duplicates(
-        subset=['siteID', 'utmZone', 'easting', 'northing', 'date']).reset_index(
+        subset=["siteID", "utmZone", "easting", "northing", "date"]).reset_index(
             drop=True)
-    tiles.dropna(axis=0, how='any', inplace=True)
+    tiles.dropna(axis=0, how="any", inplace=True)
     # convert CHEQ into STEI
-    which_cheq = tiles['siteID'] == 'STEI'
+    which_cheq = tiles["siteID"] == "STEI"
     if which_cheq.any():
-        which_easting = tiles['easting'] > 500000
+        which_easting = tiles["easting"] > 500000
         if which_easting.any:
-            tiles.loc[which_cheq, "siteID"] = 'CHEQ'
+            tiles.loc[which_cheq, "siteID"] = "CHEQ"
             tiles.drop_duplicates(inplace=True)
     if isinstance(dpID, str):
         dpID = [dpID]
@@ -47,14 +47,20 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
         for prd in dpID:
             try:
                 tile = tiles.iloc[i, :]
-                siteID, tile_year, tile_easting, tile_northing = tile['siteID'], tile[
-                    'date'].split('-')[0], tile['easting'], tile['northing']
-                by_tile_aop(prd,
-                            siteID,
-                            tile_year,
-                            tile_easting,
-                            tile_northing,
-                            savepath=savepath)
+                siteID, tile_year, tile_easting, tile_northing = (
+                    tile["siteID"],
+                    tile["date"].split("-")[0],
+                    tile["easting"],
+                    tile["northing"],
+                )
+                by_tile_aop(
+                    prd,
+                    siteID,
+                    tile_year,
+                    tile_easting,
+                    tile_northing,
+                    savepath=savepath,
+                )
 
             except Exception as e:
                 print(f'site,{tile["siteID"]},could not be fully downloaded! Error in '

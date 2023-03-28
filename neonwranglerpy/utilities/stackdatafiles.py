@@ -1,16 +1,17 @@
 """Stack the data files according to table_types."""
 import os.path
 import pandas as pd
-from neonwranglerpy import get_data
+
 import neonwranglerpy.utilities.tools as tl
 import neonwranglerpy.utilities.utils as ut
+from neonwranglerpy import get_data
 
 
 def load_table_types(dpID: str):
     """Return the dataframe about the table types of Data Products."""
-    stream = get_data('table_types.csv')
+    stream = get_data("table_types.csv")
     df = pd.read_csv(stream)
-    table_types = df[df['productID'] == dpID]
+    table_types = df[df["productID"] == dpID]
     table = table_types.reset_index(drop=True)
     return table
 
@@ -26,15 +27,15 @@ def stackdatafiles(folder_path, dst, dpID, stack_df=False):
     variables_list = [_ for _ in filepaths if "variables.20" in _]
     validation_list = [s for s in filepaths if "validation" in s]
     codes_list = [s for s in filepaths if "categoricalCodes" in s]
-    stackedpath = os.path.join(dst, 'stackedFiles')
+    stackedpath = os.path.join(dst, "stackedFiles")
 
     # getting the table types from table_types.csv
     table_types = load_table_types(dpID)
 
     # getting the table types from files
-    a_names = set([s.split('.')[6] for s in filenames])
-    t_names = [s for s in a_names if '_' in s]
-    t_filter = table_types['tableName'].isin(t_names)
+    a_names = set([s.split(".")[6] for s in filenames])
+    t_names = [s for s in a_names if "_" in s]
+    t_filter = table_types["tableName"].isin(t_names)
     tables = table_types[t_filter]
     table_names = tables.tableName
 
@@ -47,7 +48,7 @@ def stackdatafiles(folder_path, dst, dpID, stack_df=False):
         variables = ut.get_variables(varpath)
 
     if not os.path.exists(stackedpath):
-        print('creating stackedFiles directory')
+        print("creating stackedFiles directory")
         os.makedirs(stackedpath)
 
     if validation_list:
@@ -65,8 +66,7 @@ def stackdatafiles(folder_path, dst, dpID, stack_df=False):
     out = {}
     # stacking the files
     for i in range(len(table_names)):
-        file_list = [file for file in filepaths if table_names[i] in file]
-        file_list.sort()
+        file_list = sorted([file for file in filepaths if table_names[i] in file])
         temp_files = []
         stacking_list = []
 
@@ -92,7 +92,7 @@ def stackdatafiles(folder_path, dst, dpID, stack_df=False):
             out[table_names[i]] = stacked_df
         stacked_df.to_csv(df_save_path, index=False)
 
-    out['variables'] = variables
-    out['stackedpath'] = stackedpath
+    out["variables"] = variables
+    out["stackedpath"] = stackedpath
 
     return out

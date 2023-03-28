@@ -18,12 +18,12 @@ def get_tile_urls(
                   f"year {temp['data']['month']}.")
             continue
 
-        temp_ = temp['data']['files']
+        temp_ = temp["data"]["files"]
         # temp_ = json.dumps(temp['data']['files'])
         # df = pd.read_json(temp_)
         # # get the files for easting and northing
         for j in range(len(easting)):
-            urls = [x for x in temp_ if f'_{easting[j]}_{northing[j]}' in x['name']]
+            urls = [x for x in temp_ if f"_{easting[j]}_{northing[j]}" in x["name"]]
 
             #     df1 = df.loc[df['name'].str.contains(str(easting[j]))]
             #     df2 = df.loc[df['name'].str.contains(str(northing[j]))]
@@ -35,5 +35,5 @@ def get_tile_urls(
             if not len(urls):
                 print(f"no tiles found for {easting[j]} and {northing[j]}")
             file_urls.extend(urls)
-    print(f'{len(file_urls)} files found')
+    print(f"{len(file_urls)} files found")
     return file_urls

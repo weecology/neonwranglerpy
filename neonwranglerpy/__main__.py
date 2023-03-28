@@ -21,7 +21,7 @@ def main():
     """CLI main function."""
     if len(sys.argv) == 1:
         # if no command line args are passed, show the help options
-        parser.parse_args(['-h'])
+        parser.parse_args(["-h"])
     else:
         # parse args for CLI interface
         args = parser.parse_args()

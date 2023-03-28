@@ -1,28 +1,30 @@
 """Tools functions."""
+import os
 import re
 import requests
-import os
 import shutil
-from tempfile import mkdtemp
 from datetime import datetime
+from tempfile import mkdtemp
+
 from neonwranglerpy import get_data
+
 try:
     import rpy2.robjects as robjects
     from rpy2.robjects.conversion import localconverter
     from rpy2.robjects import pandas2ri
 except ImportError:
-    print('rpy2 needs R')
+    print("rpy2 needs R")
 
 
 def rda2csv(file_name):
     """Convert table_types.rda to table_types.csv."""
-    file_path = get_data(file_name + '.rda')
+    file_path = get_data(file_name + ".rda")
     robjects.r.load(file_path)
-    _df = robjects.globalenv[f'{file_name}']
+    _df = robjects.globalenv[f"{file_name}"]
     with localconverter(robjects.default_converter + pandas2ri.converter):
         df = robjects.conversion.rpy2py(_df)
     df.to_csv(
-        f'neonwranglerpy/data/{file_name}.csv',
+        f"neonwranglerpy/data/{file_name}.csv",
         index=False,
     )
     return df
@@ -33,8 +35,8 @@ def get_api(api_url, token=None):
     try:
         response = requests.get(api_url,
                                 headers={
-                                    'X-API-Token': token,
-                                    'accept': 'application/json'
+                                    "X-API-Token": token,
+                                    "accept": "application/json"
                                 })
         return response
     except Exception as e:
@@ -45,21 +47,21 @@ def get_api(api_url, token=None):
 
 def get_year_month(date):
     """Return the year-month of files."""
-    return datetime.strptime(date, '%Y-%m').date()
+    return datetime.strptime(date, "%Y-%m").date()
 
 
 def get_month_year_urls(date, all_urls, date_type):
     """Return the urls for files for specificed year-month."""
     date_urls = []
-    pattern = re.compile('20[0-9]{2}-[0-9]{2}')
+    pattern = re.compile("20[0-9]{2}-[0-9]{2}")
     y_m = get_year_month(date)
     for x in all_urls:
         year_month = re.search(pattern, x).group()
         a_y_m = get_year_month(year_month)
-        if date_type == 'start':
+        if date_type == "start":
             if a_y_m > y_m:
                 date_urls.append(x)
-        elif date_type == 'end':
+        elif date_type == "end":
             if a_y_m < y_m:
                 date_urls.append(x)
     return date_urls
@@ -86,7 +88,7 @@ def get_all_files(folder_path, dir_name=False):
 def create_temp(dst):
     """Create temporary directory."""
     if not os.path.exists(dst):
-        print(f'{dst} does not exists')
+        print(f"{dst} does not exists")
         return None
     tempdir = mkdtemp(dir=dst)
     return tempdir
@@ -116,7 +118,7 @@ def copy_zip(src, dst):
         os.makedirs(dir_path)
 
     if not os.path.isfile(src):
-        print('This function only works for zip or file')
+        print("This function only works for zip or file")
 
     shutil.copy2(src, dst)
     return

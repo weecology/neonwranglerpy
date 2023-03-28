@@ -8,7 +8,7 @@ def get_zip_urls(month_urls, package, dpID, release, token=None):
     temp = []
     # get all the file names
     for i in month_urls:
-        temp.append(get_api(i).json()['data'])
+        temp.append(get_api(i).json()["data"])
     # TODO: check for no response from API
     # TODO : add progress bar
 
