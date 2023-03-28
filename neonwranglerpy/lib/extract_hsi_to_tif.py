@@ -4,7 +4,8 @@ import os
 import rasterio
 from rasterio.transform import Affine
 
-def h5refl2array(refl_filename, remove_water_bands = True):
+
+def h5refl2array(refl_filename, remove_water_bands=True):
     """
     Extract metadata from h5 object and reflectance values
     returns: metadata and a numpy array
@@ -44,17 +45,22 @@ def h5refl2array(refl_filename, remove_water_bands = True):
     sns_az = hdf5_file[sitename]['Reflectance/Metadata/to-sensor_azimuth_angle'][()]
     sns_zn = hdf5_file[sitename]['Reflectance/Metadata/to-sensor_zenith_angle'][()]
     #get solar angles as array to leverage flightpaths mosaic
-    flightpaths = hdf5_file[sitename]['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
-    sol_zn = hdf5_file[sitename]['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
-    sol_az = hdf5_file[sitename]['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
+    flightpaths = hdf5_file[sitename][
+        'Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
+    sol_zn = hdf5_file[sitename][
+        'Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
+    sol_az = hdf5_file[sitename][
+        'Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
     for pt in range(len(solar_angles)):
-        sol_az[flightpaths==solar_angles[pt][0]] = solar_angles[pt][1]
-        sol_zn[flightpaths==solar_angles[pt][0]] = solar_angles[pt][2]
+        sol_az[flightpaths == solar_angles[pt][0]] = solar_angles[pt][1]
+        sol_zn[flightpaths == solar_angles[pt][0]] = solar_angles[pt][2]
+
+
 #
-    mapInfo_string = str(metadata['mapInfo']);
+    mapInfo_string = str(metadata['mapInfo'])
     mapInfo_split = mapInfo_string.split(",")
     mapInfo_split
-#
+    #
     # Extract the resolution & convert to floating decimal number
     metadata['res'] = {}
     metadata['res']['pixelWidth'] = float(mapInfo_split[5])
@@ -65,10 +71,10 @@ def h5refl2array(refl_filename, remove_water_bands = True):
     yMax = float(mapInfo_split[4])
 
     # Calculate the xMax and yMin values from the dimensions
-    xMax = xMin + (metadata['shape'][1] * metadata['res']['pixelWidth']) 
-     # xMax = left edge + (# of columns * resolution)",
-    yMin = yMax - (metadata['shape'][0] * metadata['res']['pixelHeight']) 
-     # yMin = top edge - (# of rows * resolution)",
+    xMax = xMin + (metadata['shape'][1] * metadata['res']['pixelWidth'])
+    # xMax = left edge + (# of columns * resolution)",
+    yMin = yMax - (metadata['shape'][0] * metadata['res']['pixelHeight'])
+    # yMin = top edge - (# of rows * resolution)",
     metadata['extent'] = (xMin, xMax, yMin, yMax)  # useful format for plotting
     metadata['ext_dict'] = {}
     metadata['ext_dict']['xMin'] = xMin
@@ -79,33 +85,35 @@ def h5refl2array(refl_filename, remove_water_bands = True):
     reflArray = reflArray['Reflectance_Data'][()]
     hdf5_file.close()
 
-
-    return(reflArray, metadata, sol_az, sol_zn, sns_az, sns_zn )
-
-
+    return (reflArray, metadata, sol_az, sol_zn, sns_az, sns_zn)
 
 
 def tile_solar_angle(full_path):
     hdf5_file = h5py.File(full_path, 'r')
     file_attrs_string = str(list(hdf5_file.items()))
     file_attrs_string_split = file_attrs_string.split("'")
-    sitename = file_attrs_string_split[1]    
-    flight_paths = hdf5_file[sitename]["Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"].attrs["Data_Files"]
-    flight_paths=str(flight_paths).split(",")
-    which_paths = np.unique(hdf5_file[sitename]["Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"][()])
+    sitename = file_attrs_string_split[1]
+    flight_paths = hdf5_file[sitename][
+        "Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"].attrs["Data_Files"]
+    flight_paths = str(flight_paths).split(",")
+    which_paths = np.unique(
+        hdf5_file[sitename]["Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"]
+        [()])
     solar_angle = []
     for pt in which_paths:
         #if pt is negative, get any from the available to avoid error(the pixel is blank anyway)
         if pt < 0:
-            flight = (flight_paths)[ which_paths[-1]].split("_")[5]
+            flight = (flight_paths)[which_paths[-1]].split("_")[5]
         else:
             flight = (flight_paths)[pt].split("_")[5]
-          #  
-        sol_az = hdf5_file[sitename]["Reflectance/Metadata/Logs/"][str(flight)]["Solar_Azimuth_Angle"][()]
-        sol_zn = hdf5_file[sitename]["Reflectance/Metadata/Logs/"][str(flight)]["Solar_Zenith_Angle"][()]
+        #
+        sol_az = hdf5_file[sitename]["Reflectance/Metadata/Logs/"][str(
+            flight)]["Solar_Azimuth_Angle"][()]
+        sol_zn = hdf5_file[sitename]["Reflectance/Metadata/Logs/"][str(
+            flight)]["Solar_Zenith_Angle"][()]
         solar_angle.append([pt, sol_az, sol_zn])
-    return(solar_angle)
-    
+    return (solar_angle)
+
 
 def stack_subset_bands(reflArray, reflArray_metadata, bands, clipIndex):
     subArray_rows = clipIndex['yMax'] - clipIndex['yMin']
@@ -131,9 +139,16 @@ def subset_clean_band(reflArray, reflArray_metadata, clipIndex, bandIndex):
 
     return bandCleaned
 
+
 #    array2raster(tilename, hyperspec_raster, sub_meta, clipExtent, save_dir)
 
-def array2raster(newRaster, reflBandArray, reflArray_metadata, extent, ras_dir, invert_axes = True):
+
+def array2raster(newRaster,
+                 reflBandArray,
+                 reflArray_metadata,
+                 extent,
+                 ras_dir,
+                 invert_axes=True):
     """
     newRaster: filename of the raster object
     reflBandArray: Clipped wavelength data,
@@ -146,7 +161,7 @@ def array2raster(newRaster, reflBandArray, reflArray_metadata, extent, ras_dir, 
         cols = reflBandArray.shape[1]
         rows = reflBandArray.shape[0]
         bands = reflBandArray.shape[2]
-        reflBandArray = np.moveaxis(reflBandArray,2,0)  
+        reflBandArray = np.moveaxis(reflBandArray, 2, 0)
     else:
         cols = reflBandArray.shape[1]
         rows = reflBandArray.shape[2]
@@ -157,18 +172,19 @@ def array2raster(newRaster, reflBandArray, reflArray_metadata, extent, ras_dir, 
     res = reflArray_metadata['res']['pixelWidth']
     transform = Affine.translation(originX, originY) * Affine.scale(res, -res)
     with rasterio.open(
-        "{}/{}".format(ras_dir,newRaster),
-         'w',
-         driver='GTiff',
-         height=rows,
-         width=cols,
-         count=bands,
-         dtype=reflBandArray.dtype,
-         crs=rasterio.crs.CRS.from_dict(init='epsg:'+str(reflArray_metadata["epsg"])),
-         transform=transform,) as dst:
+            "{}/{}".format(ras_dir, newRaster),
+            'w',
+            driver='GTiff',
+            height=rows,
+            width=cols,
+            count=bands,
+            dtype=reflBandArray.dtype,
+            crs=rasterio.crs.CRS.from_dict(init='epsg:' +
+                                           str(reflArray_metadata["epsg"])),
+            transform=transform,
+    ) as dst:
         dst.write(reflBandArray)
-    return(reflBandArray)
-        
+    return (reflBandArray)
 
 
 def calc_clip_index(clipExtent, h5Extent, xscale=1, yscale=1):
@@ -185,7 +201,13 @@ def calc_clip_index(clipExtent, h5Extent, xscale=1, yscale=1):
     return ind_ext
 
 
-def generate_raster(h5_path, save_dir, rgb_filename=None, bands="no_water", correction="all", bounds = False, suffix=None):
+def generate_raster(h5_path,
+                    save_dir,
+                    rgb_filename=None,
+                    bands="no_water",
+                    correction="all",
+                    bounds=False,
+                    suffix=None):
     """
     h5_path: input path to h5 file on disk
     bands: "all" bands or "false color", "no_water" bands
@@ -213,8 +235,8 @@ def generate_raster(h5_path, save_dir, rgb_filename=None, bands="no_water", corr
         rgb = np.r_[0:426]
     else:
         raise ValueError("no band combination specified")
-    
-    refl = refl[:,:,rgb]
+
+    refl = refl[:, :, rgb]
     xmin, xmax, ymin, ymax = metadata['extent']
 
     #Optional clip
@@ -244,7 +266,6 @@ def generate_raster(h5_path, save_dir, rgb_filename=None, bands="no_water", corr
     sns_az = sns_az[(subInd['yMin']):subInd['yMax'], (subInd['xMin']):subInd['xMax']]
     sns_zn = sns_zn[(subInd['yMin']):subInd['yMax'], (subInd['xMin']):subInd['xMax']]
 
-    
     #Create new filepath
     if bands == "false_color":
         tilename = os.path.splitext(
@@ -254,10 +275,14 @@ def generate_raster(h5_path, save_dir, rgb_filename=None, bands="no_water", corr
             os.path.basename(rgb_filename))[0] + "_hyperspectral{}.tif".format(suffix)
 
     #stach solar and sensor data to be used for corrections
-    sol_sens_angle =  np.array([sol_az,sol_zn,sns_az,sns_zn])
+    sol_sens_angle = np.array([sol_az, sol_zn, sns_az, sns_zn])
     solar_tilename = os.path.splitext(
         os.path.basename(rgb_filename))[0] + "_solar_sensor_angle{}.tif".format(suffix)
     #Save georeference crop to file
-    array2raster(solar_tilename, sol_sens_angle, metadata, clipExtent, save_dir, invert_axes = False)
-    array2raster(tilename, refl, metadata, clipExtent, save_dir, invert_axes = True)
-
+    array2raster(solar_tilename,
+                 sol_sens_angle,
+                 metadata,
+                 clipExtent,
+                 save_dir,
+                 invert_axes=False)
+    array2raster(tilename, refl, metadata, clipExtent, save_dir, invert_axes=True)

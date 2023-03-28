@@ -3,6 +3,7 @@ import os
 from neonwranglerpy.lib.clip_raster import clip_raster
 from neonwranglerpy.lib.extract_hsi_to_tif import generate_raster
 
+
 def clip_plot(plt, list_data, bff=12, savepath=""):
     """Clip Plots around Vegetation Structure."""
     # convert the type of easting and northing to numeric
