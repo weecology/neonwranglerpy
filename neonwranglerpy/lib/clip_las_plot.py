@@ -4,14 +4,15 @@ import numpy as np
 
 
 def clip_las_plot(plt, data_path, buffer, savepath):
-    """Given a Laz file, clip it by the size of the input plot.
+    """
+    Given a Laz file, clip it by the size of the input plot.
+    
     Parameters:
     plt = string with at least easting and northing of the center of the target plot
     data_path =  path in which the laz/las file is stored
     buffer = the buffer around the center of the plot (plot size divided by 2)
     savepath =  full path where to store the clipped laz file.
     """
-
     # open the NEON las tile
     las = laspy.read(data_path)
     # builds the bounding box with center (easting, northing)

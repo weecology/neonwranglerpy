@@ -1,4 +1,4 @@
-"""Extract metadata from h5 object and reflectance values """
+"""Extract metadata from h5 object and reflectance values."""
 import numpy as np
 import h5py
 import os
@@ -9,9 +9,9 @@ from rasterio.transform import Affine
 def h5refl2array(refl_filename, remove_water_bands=True):
     """
     Extract metadata from h5 object and reflectance values.
+
     returns: metadata and a numpy array
     """
-
     hdf5_file = h5py.File(refl_filename, 'r')
     file_attrs_string = str(list(hdf5_file.items()))
     file_attrs_string_split = file_attrs_string.split("'")
@@ -47,12 +47,12 @@ def h5refl2array(refl_filename, remove_water_bands=True):
     sns_az = hdf5_file[sitename]['Reflectance/Metadata/to-sensor_azimuth_angle'][()]
     sns_zn = hdf5_file[sitename]['Reflectance/Metadata/to-sensor_zenith_angle'][()]
     # get solar angles as array to leverage flightpaths mosaic
-    flightpaths = hdf5_file[sitename]
-    ['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
-    sol_zn = hdf5_file[sitename]
-    ['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
-    sol_az = hdf5_file[sitename]
-    ['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
+    flightpaths = [hdf5_file[sitename]
+                   ['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]]
+    sol_zn = [hdf5_file[sitename]
+              ['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]]
+    sol_az = [hdf5_file[sitename]
+              ['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]]
     for pt in range(len(solar_angles)):
         sol_az[flightpaths == solar_angles[pt][0]] = solar_angles[pt][1]
         sol_zn[flightpaths == solar_angles[pt][0]] = solar_angles[pt][2]
@@ -88,10 +88,7 @@ def h5refl2array(refl_filename, remove_water_bands=True):
 
 
 def tile_solar_angle(full_path):
-    """
-    Title solar angel
-    """
-
+    """Title solar angel."""
     hdf5_file = h5py.File(full_path, 'r')
     file_attrs_string = str(list(hdf5_file.items()))
     file_attrs_string_split = file_attrs_string.split("'")
@@ -110,19 +107,16 @@ def tile_solar_angle(full_path):
         else:
             flight = (flight_paths)[pt].split("_")[5]
         #
-        sol_az = hdf5_file[sitename]["Reflectance/Metadata/Logs/"][str(flight)]
-        ["Solar_Azimuth_Angle"][()]
-        sol_zn = hdf5_file[sitename]["Reflectance/Metadata/Logs/"][str(flight)]
-        ["Solar_Zenith_Angle"][()]
+        sol_az = [hdf5_file[sitename]["Reflectance/Metadata/Logs/"]
+                  [str(flight)]["Solar_Azimuth_Angle"][()]]
+        sol_zn = [hdf5_file[sitename]["Reflectance/Metadata/Logs/"]
+                  [str(flight)]["Solar_Zenith_Angle"][()]]
         solar_angle.append([pt, sol_az, sol_zn])
     return (solar_angle)
 
 
 def stack_subset_bands(reflArray, reflArray_metadata, bands, clipIndex):
-    """
-    Stack subset bands
-    """
-
+    """Stack subset bands."""
     subArray_rows = clipIndex['yMax'] - clipIndex['yMin']
     subArray_cols = clipIndex['xMax'] - clipIndex['xMin']
 
@@ -140,10 +134,7 @@ def stack_subset_bands(reflArray, reflArray_metadata, bands, clipIndex):
 
 
 def subset_clean_band(reflArray, reflArray_metadata, clipIndex, bandIndex):
-    """
-    Subset clean band
-    """
-
+    """Subset clean band."""
     bandCleaned = reflArray[clipIndex['yMin']:clipIndex['yMax'],
                             clipIndex['xMin']:clipIndex['xMax'],
                             bandIndex - 1].astype(np.int16)
@@ -156,7 +147,8 @@ def subset_clean_band(reflArray, reflArray_metadata, clipIndex, bandIndex):
 def array2raster(newRaster, reflBandArray, reflArray_metadata, extent, ras_dir,
                  invert_axes=True):
     """
-    newRaster: filename of the raster object
+    newRaster: filename of the raster object.
+
     reflBandArray: Clipped wavelength data,
     reflArray_metadata: Clipped wavelength metadata
     extent: The UTM coordinate extent
@@ -192,7 +184,7 @@ def array2raster(newRaster, reflBandArray, reflArray_metadata, extent, ras_dir,
 
 
 def calc_clip_index(clipExtent, h5Extent, xscale=1, yscale=1):
-    """Extract numpy index for the utm coordinates"""
+    """Extract numpy index for the utm coordinates."""
     h5rows = h5Extent['yMax'] - h5Extent['yMin']
     # h5cols = h5Extent['xMax'] - h5Extent['xMin']
 
@@ -208,11 +200,11 @@ def calc_clip_index(clipExtent, h5Extent, xscale=1, yscale=1):
 def generate_raster(h5_path, save_dir, rgb_filename=None, bands="no_water",
                     correction="all", bounds=False, suffix=None):
     """
-    h5_path: input path to h5 file on disk
+    h5_path: input path to h5 file on disk.
+
     bands: "all" bands or "false color", "no_water" bands
     save_dir: Directory to save raster object
     rgb_filename= Path to rgb image to draw extent and crs definition
-
     returns: True if saved file exists
     """
     if suffix:
