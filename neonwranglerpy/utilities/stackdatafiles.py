@@ -65,8 +65,7 @@ def stackdatafiles(folder_path, dst, dpID, stack_df=False):
     out = {}
     # stacking the files
     for i in range(len(table_names)):
-        file_list = [file for file in filepaths if table_names[i] in file]
-        file_list.sort()
+        file_list = sorted([file for file in filepaths if table_names[i] in file])
         temp_files = []
         stacking_list = []
 
