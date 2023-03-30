@@ -71,4 +71,3 @@ def test_retrieve_vst_data(test_name, dpID, site, start_date, end_date, args, ex
     first_row_data = list(data_frame['vst'].iloc[0, :-3].fillna(0))
     assert columns_values == expected['cols']
     assert first_row_data == expected['data']
-
