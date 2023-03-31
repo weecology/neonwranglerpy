@@ -19,7 +19,6 @@ jobs:
         python-version: ["3.8", "3.10"]
         os: [ubuntu-latest, ubuntu-20.04, macOS-latest]
         venv_activate: ["source pyenv_base/bin/activate"]
-        ld_libpath: ["export LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}"]
         
     steps:
     - uses: actions/checkout@v3
