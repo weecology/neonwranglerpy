@@ -82,4 +82,6 @@ def crop_data_to_plot(plt,
         list_data = [file for file in files if site in file]
         files_list.extend(list_data)
 
-    plots = plots.apply(lambda p: clip_plot(p, list_data,savepath=savepath), axis=1, result_type='expand')
+    plots = plots.apply(lambda p: clip_plot(p, list_data, savepath=savepath),
+                        axis=1,
+                        result_type='expand')

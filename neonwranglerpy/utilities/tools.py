@@ -5,7 +5,7 @@ import os
 import shutil
 from tempfile import mkdtemp
 from datetime import datetime
-from neonwranglerpy import get_data
+# from neonwranglerpy import get_data
 
 
 def get_api(api_url, token=None):
