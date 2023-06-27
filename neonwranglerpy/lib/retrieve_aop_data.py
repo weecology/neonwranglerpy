@@ -22,11 +22,12 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
         The full path to the folder in which the files would be placed locally.
     """
     coords_for_tiles = data[[
-        'plotID', 'siteID', 'utmZone', 'easting', 'northing'#, 'date'
-    ]]
+        'plotID', 'siteID', 'utmZone', 'easting', 'northing']]
     # get tiles dimensions
-    coords_for_tiles['easting'] = (coords_for_tiles[['easting']] / 1000).astype(int) * 1000
-    coords_for_tiles['northing'] = (coords_for_tiles[['northing']] / 1000).astype(int)  * 1000
+    coords_for_tiles['easting'] = (coords_for_tiles[['easting']] / 
+                                   1000).astype(int) * 1000
+    coords_for_tiles['northing'] = (coords_for_tiles[['northing']] / 
+                                    1000).astype(int) * 1000
 
     # drop duplicates values
     tiles = coords_for_tiles.drop_duplicates(
