@@ -2,6 +2,7 @@
 import math
 import os
 import re
+import numpy as np
 from urllib.error import HTTPError
 from urllib.request import urlretrieve
 import pandas as pd
@@ -121,8 +122,9 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
             _df = pd.concat([df18N_in17nm, df17N])
             easting, northing = _df.easting, _df.northing
 
-    tile_easting = [math.floor(float(x / 1000)) * 1000 for x in easting]
-    tile_northing = [math.floor(float(x / 1000)) * 1000 for x in northing]
+    tile_easting = np.floor(easting / 1000).astype(int) * 1000
+    tile_northing = np.floor(northing / 1000).astype(int) * 1000
+
     file_urls = get_tile_urls(month_urls, tile_easting, tile_northing)
 
     if not savepath:
