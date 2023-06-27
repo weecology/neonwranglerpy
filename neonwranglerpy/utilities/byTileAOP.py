@@ -73,7 +73,8 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
             all_urls = response['data']['siteCodes'][i]['availableDataUrls']
     if not len(all_urls):
         return f"There is no data for {site}"
-    month_urls = [x for x in all_urls if re.search(year, x)]
+    year_pattern = re.compile(str(year))
+    month_urls = [x for x in all_urls if re.search(year_pattern, x)]
     if not len(month_urls):
         print(f"There is no data for site {site} and year {year}")
 
