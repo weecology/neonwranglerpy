@@ -77,4 +77,4 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
 
             except Exception as e:
                 print(f'site,{tile["siteID"]},could not be fully downloaded! Error in '
-                      f'retrieving:{prd}, for year,{tile["year"]}, .error returned: {e}')
+                      f'retrieving:{prd}, for year,{year}, .error returned: {e}')
