@@ -35,5 +35,5 @@ def get_tile_urls(
             if not len(urls):
                 print(f"no tiles found for {easting[j]} and {northing[j]}")
             file_urls.extend(urls)
-    print(f'{len(file_urls)} files found')
+            print(f'{len(file_urls)} files found')
     return file_urls
