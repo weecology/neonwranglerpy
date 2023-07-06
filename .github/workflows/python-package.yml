@@ -17,15 +17,21 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.10"]
+        r-version: ['release']
         os: [ubuntu-latest, ubuntu-20.04, macOS-latest]
         venv_activate: ["source pyenv_base/bin/activate"]
+        ld_libpath: ["export LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}"]
         
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up R ${{ matrix.r-version }}
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: ${{ matrix.r-version }}
     - name: Install dependencies
       run: |
         python -m venv pyenv_base
@@ -44,7 +50,7 @@ jobs:
     - name: Test with pytest
       run: |
         ${{ matrix.venv_activate }}
-        pytest -v -k "not (test_retrieve_vst_dat or test_load_by_product)" --cov=./neonwranglerpy --cov-report=xml
+        pytest -v --cov=./neonwranglerpy --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
