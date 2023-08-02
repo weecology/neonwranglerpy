@@ -65,12 +65,12 @@ def zips_by_product(dpID,
         return f"{dpID} is not a properly formatted data product ID. The correct format" \
                f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
 
-    if len(start_date):
+    if start_date is not None:
         if not re.match(DATE_PATTERN, start_date):
             return 'startdate and enddate must be either NA or valid dates in the form '\
                    'YYYY-MM'
 
-    if len(end_date):
+    if end_date is not None:
         if not re.match(DATE_PATTERN, end_date):
             return 'startdate and enddate must be either NA or valid dates in the form ' \
                    'YYYY-MM'
@@ -109,13 +109,13 @@ def zips_by_product(dpID,
         print(f"There is no data for site {site}")
 
     # extracting urls for specified start and end dates
-    if len(start_date):
+    if start_date is not None:
         month_urls = get_month_year_urls(start_date, month_urls, 'start')
 
     if not len(month_urls):
         print("There is no data for selected dates")
 
-    if len(end_date):
+    if end_date is not None:
         month_urls = get_month_year_urls(end_date, month_urls, 'end')
 
     if not len(month_urls):
@@ -135,7 +135,9 @@ def zips_by_product(dpID,
         os.makedirs(savepath)
 
     files_to_stack_path = os.path.join(savepath, "filesToStack")
-    os.mkdir(files_to_stack_path)
+    # if it doesn't exists, create a directory
+    if not os.path.isdir(files_to_stack_path):
+        os.mkdir(files_to_stack_path)
 
     # TODO: add progress bar
 
@@ -146,14 +148,28 @@ def zips_by_product(dpID,
                 zips['release']
             ])
             zip_dir_path = os.path.join(files_to_stack_path, f'{dirname}')
-            os.mkdir(zip_dir_path)
-            for file in zips['files']:
-                try:
-                    save_path = os.path.join(zip_dir_path, f"{file['name']}")
-                    file_path, _ = urlretrieve(file['url'], save_path)
+            os.makedirs(zip_dir_path, exist_ok=True)
 
-                except HTTPError as e:
-                    print("HTTPError :", e)
-                    return None
+            # Use ThreadPoolExecutor to download files concurrently
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                executor.map(download_file, zips['files'], [zip_dir_path]*len(zips['files']))
     # returns the path to /filestostack directory
     return files_to_stack_path
+
+
+import concurrent.futures
+import os
+from urllib.request import urlretrieve
+from urllib.error import HTTPError, URLError
+
+# Function to download a file
+def download_file(file_info, zip_dir_path):
+    try:
+        save_path = os.path.join(zip_dir_path, f"{file_info['name']}")
+        file_path, _ = urlretrieve(file_info['url'], save_path)
+    except HTTPError as e:
+        print(f"HTTPError: {e}")
+    except URLError as e:
+        print(f"URL Error (Possible disconnection): {e}")
+
+

@@ -32,17 +32,18 @@ def retrieve_coords_itc(dat):
     plots_df = plots.loc[vst_rows]
 
     convert_dict = {
-        'pointID': str,
+        'pointID': 'string',
     }
-    # converting the pointID dtype from string to float64
-    plots_df = plots_df.astype({'pointID': 'float64'})
+    # converting the pointID dtype from float to character
+    plots_df = plots_df.astype({'pointID': 'Int64'}).astype(convert_dict)
+    data = dat.astype({'pointID': 'Int64'}).astype(convert_dict)
 
-    vst_df = dat.merge(plots_df, how='inner', on=['plotID', 'pointID', 'siteID'])
-    vst_df = vst_df.astype(convert_dict)
-    na_values = vst_df['stemAzimuth'].isnull().values.any()
-    if na_values:
+    vst_df = data.merge(plots_df, how='inner', on=['plotID', 'pointID', 'siteID'])
+    na_values = vst_df['stemAzimuth'].isnull().values.sum()
+
+    if na_values > 0:
         print(
-            f"{len(na_values)} entries could not be georeferenced and will be discarded.")
+            f"{(na_values)} entries could not be georeferenced and will be discarded.")
         vst_df.dropna(subset=['stemAzimuth'], axis=0, inplace=True)
         vst_df.reset_index(drop=True, inplace=True)
     # if retrieve_dist_to_utm doesn't work add p[0] as an extra argument to
