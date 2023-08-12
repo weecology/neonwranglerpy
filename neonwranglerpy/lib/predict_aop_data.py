@@ -11,7 +11,8 @@ from neonwranglerpy.lib.retrieve_aop_data import retrieve_aop_data
 
 
 def predict_aop_data(vst_data,
-                     year, dpID='DP3.30010.001',
+                     year,
+                     dpID='DP3.30010.001',
                      savepath='/content',
                      site='DELA',
                      plot_crop=True):
@@ -33,14 +34,16 @@ def predict_aop_data(vst_data,
                     savepath='/content', site='DELA')
     """
     retrieve_aop_data(vst_data, year, dpID, savepath)
-    geometry = [Point(easting, northing) for easting, northing in
-                zip(vst_data['easting'], vst_data['northing'])]
-    epsg_codes = (vst_data['utmZone'].map(lambda x: (326 * 100) +
-                                          int(x[:-1]))).astype(str)
+    geometry = [
+        Point(easting, northing)
+        for easting, northing in zip(vst_data['easting'], vst_data['northing'])
+    ]
+    epsg_codes = (
+        vst_data['utmZone'].map(lambda x: (326 * 100) + int(x[:-1]))).astype(str)
     geo_data_frame = gpd.GeoDataFrame(vst_data, geometry=geometry, crs=epsg_codes.iloc[0])
     site_level_data = vst_data[vst_data.plotID.str.contains(site)]
-    get_tiles = ((site_level_data.easting/1000).astype(int) * 1000).astype(str) + "_"
-    + ((site_level_data.northing/1000).astype(int) * 1000).astype(str)
+    get_tiles = ((site_level_data.easting / 1000).astype(int) * 1000).astype(str) + "_"
+    +((site_level_data.northing / 1000).astype(int) * 1000).astype(str)
     print(get_tiles.unique())
 
     pattern = fr"{year}_{site}_.*_{get_tiles.unique()[0]}"
@@ -74,10 +77,10 @@ def predict_aop_data(vst_data,
                         easting = row.easting
                         northing = row.northing
 
-                        x_min = int(affine[2] + 10/affine[0] - easting)
-                        y_min = int(affine[5] + 10/affine[0] - northing)
-                        x_max = int(affine[2] - 10/affine[0] - easting)
-                        y_max = int(affine[5] - 10/affine[0] - northing)
+                        x_min = int(affine[2] + 10 / affine[0] - easting)
+                        y_min = int(affine[5] + 10 / affine[0] - northing)
+                        x_max = int(affine[2] - 10 / affine[0] - easting)
+                        y_max = int(affine[5] - 10 / affine[0] - northing)
 
                         print(x_min, y_min, x_max, y_max)
                         section = image[y_max:y_min, x_max:x_min, :]
@@ -94,4 +97,3 @@ def predict_aop_data(vst_data,
                         all_predictions.append(prediction)
 
     return all_predictions
-

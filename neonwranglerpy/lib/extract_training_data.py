@@ -1,11 +1,10 @@
+"""Extract training data from NEON AOP data."""
 import geopandas as gpd
 import cv2
 import os
 import re
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from shapely.geometry import Point
 import rasterio
 from deepforest import main
 from deepforest import utilities
@@ -14,11 +13,12 @@ from neonwranglerpy.lib.retrieve_aop_data import retrieve_aop_data
 
 def extract_training_data(vst_data,
                           geo_data_frame,
-                     year, dpID='DP3.30010.001',
-                     savepath='/content',
-                     site='DELA'):
+                          year,
+                          dpID='DP3.30010.001',
+                          savepath='/content',
+                          site='DELA'):
     """
-    Extracting training data with geo_data_frame and image predictions.
+    Extract training data with geo_data_frame and image predictions.
 
     Parameters
     ------------
@@ -37,12 +37,13 @@ def extract_training_data(vst_data,
                                         int(x[:-1]))).astype(str)
     geo_data_frame = gpd.GeoDataFrame(vst_data, geometry=geometry, crs=epsg_codes.iloc[0])
 
-    extract_training_data(vst_data=vst_data, geo_data_frame=geo_data_frame, year='2018', dpID='DP3.30010.001',
-                    savepath='/content', site='DELA')
+    extract_training_data(vst_data=vst_data, geo_data_frame=geo_data_frame, year='2018',
+    dpID='DP3.30010.001', savepath='/content', site='DELA')
     """
     retrieve_aop_data(vst_data, year, dpID, savepath)
     site_level_data = vst_data[vst_data.plotID.str.contains(site)]
-    get_tiles = ((site_level_data.easting/1000).astype(int) * 1000).astype(str) + "_" + ((site_level_data.northing/1000).astype(int) * 1000).astype(str)
+    get_tiles = (((site_level_data.easting / 1000).astype(int) * 1000).astype(str) + "_" +
+                 ((site_level_data.northing / 1000).astype(int) * 1000).astype(str))
     print("get_tiles")
     print(get_tiles.unique())
 
@@ -85,46 +86,87 @@ def extract_training_data(vst_data,
                         easting = row.easting
                         northing = row.northing
 
-                        x_min = int(affine[2] + 10/affine[0] - easting)
-                        y_min = int(affine[5] + 10/affine[0] - northing)
-                        x_max = int(affine[2] - 10/affine[0] - easting)
-                        y_max = int(affine[5] - 10/affine[0] - northing)
+                        x_min = int(affine[2] + 10 / affine[0] - easting)
+                        y_min = int(affine[5] + 10 / affine[0] - northing)
+                        x_max = int(affine[2] - 10 / affine[0] - easting)
+                        y_max = int(affine[5] - 10 / affine[0] - northing)
 
-                        section_file = os.path.join(output_folder, f"section_{x_min}_{y_min}_{x_max}_{y_max}.tif")
+                        file_name = f"section_{x_min}_{y_min}_{x_max}_{y_max}.tif"
 
+                        section_file = os.path.join(output_folder, file_name)
 
                         if section_file not in section_files:
+                            section = image[y_max:y_min, x_max:x_min, :]
+                            print("Section shape:", section.shape)
 
-                          section = image[y_max:y_min, x_max:x_min, :]
-                          print("Section shape:", section.shape)
+                            section_meta = src.meta.copy()
+                            section_meta['width'] = (affine[2] + x_min) - (affine[2] +
+                                                                           x_max)
+                            section_meta['height'] = (affine[5] + y_min) - (affine[5] +
+                                                                            y_max)
+                            section_meta['transform'] = rasterio.Affine(
+                                affine[0], 0, (affine[2] - x_min), 0, affine[4],
+                                (affine[5] - y_min))
 
-                          section_meta = src.meta.copy()
-                          section_meta['width'], section_meta['height'] = (affine[2] + x_min) - (affine[2] + x_max), (affine[5] + y_min) - (affine[5] + y_max)
-                          section_meta['transform'] = rasterio.Affine(affine[0], 0, (affine[2] - x_min), 0, affine[4], (affine[5] - y_min))
+                            section_np = np.moveaxis(section, -1, 0)
 
+                            with rasterio.open(section_file, 'w', **section_meta) as dst:
+                                dst.write(section_np)
+                                section_affine = dst.transform
 
-                          section_np = np.moveaxis(section, -1, 0)
+                            section_files[section_file] = section_affine
 
-                          with rasterio.open(section_file, 'w', **section_meta) as dst:
-                              dst.write(section_np)
-                              section_affine = dst.transform
+                            print("Crop affine: ")
+                            print(section_affine)
 
-                          section_files[section_file] = section_affine
-
-                          print("Crop affine: ")
-                          print(section_affine)
-
-                          print("Expected file path:", section_file)
+                            print("Expected file path:", section_file)
 
                         prediction = model.predict_image(path=section_file)
 
-                        gdf = utilities.boxes_to_shapefile(prediction, root_dir=os.path.dirname(section_file), projected=True)
+                        gdf = utilities.boxes_to_shapefile(
+                            prediction,
+                            root_dir=os.path.dirname(section_file),
+                            projected=True)
 
                         all_predictions.append(gdf)
 
     all_predictions_df = pd.concat(all_predictions)
 
+    all_predictions_df['temp_geo'] = all_predictions_df['geometry']
+
     merged_data = gpd.sjoin(geo_data_frame, all_predictions_df, how="inner", op="within")
+    merged_data.drop(columns=['geometry'], inplace=True)
+    merged_data.rename(columns={'temp_geo': 'geometry'}, inplace=True)
+    canopy_position_mapping = {
+        np.nan: 0,
+        'Full shade': 1,
+        'Mostly shaded': 2,
+        'Partially shaded': 3,
+        'Full sun': 4,
+        'Open grown': 5
+    }
 
+    predictions = merged_data
 
-    return merged_data
+    predictions_copy = predictions.copy()
+
+    cp = 'canopyPosition'
+
+    predictions_copy[cp] = predictions_copy[cp].replace(canopy_position_mapping)
+
+    duplicate_mask = predictions_copy.duplicated(subset=['xmin', 'ymin', 'xmax', 'ymax'],
+                                                 keep=False)
+
+    duplicate_entries = predictions[duplicate_mask]
+
+    print(duplicate_entries)
+
+    predictions_sorted = predictions.sort_values(by=['height', cp, 'stemDiameter'],
+                                                 ascending=[False, False, False])
+
+    duplicates_mask = predictions_sorted.duplicated(
+        subset=['xmin', 'ymin', 'xmax', 'ymax'], keep='first')
+
+    clean_predictions = predictions_sorted[~duplicates_mask]
+
+    return clean_predictions

@@ -1,6 +1,7 @@
 """Download AOP data around vst data for specified year, site."""
 from neonwranglerpy.utilities.byTileAOP import by_tile_aop
 
+
 def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
     """Download AOP data around vst data for specified year, site.
 
@@ -20,20 +21,18 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
     savepath : str
         The full path to the folder in which the files would be placed locally.
     """
-    coords_for_tiles = data[[
-        'plotID', 'siteID', 'utmZone', 'easting', 'northing']]
+    coords_for_tiles = data[['plotID', 'siteID', 'utmZone', 'easting', 'northing']]
     # get tiles dimensions
-    coords_for_tiles['easting'] = (coords_for_tiles[['easting']] / 
+    coords_for_tiles['easting'] = (coords_for_tiles[['easting']] /
                                    1000).astype(int) * 1000
-    coords_for_tiles['northing'] = (coords_for_tiles[['northing']] / 
+    coords_for_tiles['northing'] = (coords_for_tiles[['northing']] /
                                     1000).astype(int) * 1000
-    print(coords_for_tiles.easting.shape[0] )
+    print(coords_for_tiles.easting.shape[0])
     # if there are more than 1 row, drop duplicates
     if coords_for_tiles.easting.shape[0] > 1:
-    # drop duplicates values
+        # drop duplicates values
         tiles = coords_for_tiles.drop_duplicates(
-            subset=['siteID', 'utmZone', 'easting', 'northing']).reset_index(
-                drop=True)
+            subset=['siteID', 'utmZone', 'easting', 'northing']).reset_index(drop=True)
         tiles.dropna(axis=0, how='any', inplace=True)
 
         # convert CHEQ into STEI
@@ -49,7 +48,7 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
     else:
         tiles = coords_for_tiles
         tiles.dropna(axis=0, how='any', inplace=True)
-            # convert CHEQ into STEI
+        # convert CHEQ into STEI
         which_cheq = tiles['siteID'] == 'STEI'
         if which_cheq:
             which_easting = tiles['easting'] > 500000
@@ -64,9 +63,13 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
             try:
                 if coords_for_tiles.easting.shape[0] > 1:
                     tile = tiles.iloc[i, :]
-                    siteID, tile_easting, tile_northing = tile['siteID'], tile['easting'], tile['northing']
+                    siteID = tile['siteID']
+                    tile_easting = tile['easting']
+                    tile_northing = tile['northing']
                 else:
-                    siteID, tile_easting, tile_northing = tiles['siteID'], tiles['easting'][0], tiles['northing'][0]
+                    siteID = tiles['siteID']
+                    tile_easting = tiles['easting'][0]
+                    tile_northing = tiles['northing'][0]
 
                 by_tile_aop(prd,
                             siteID,
