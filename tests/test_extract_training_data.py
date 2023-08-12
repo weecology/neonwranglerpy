@@ -1,19 +1,14 @@
 """Test extract_training_data.py file."""
 import geopandas as gpd
+import pandas as pd
 from shapely.geometry import Point
-from neonwranglerpy.lib.retrieve_vst_data import retrieve_vst_data
 from neonwranglerpy.lib.extract_training_data import extract_training_data
 
 
 def test_extract_training_data():
     """Test extract_training_data function."""
     savepath = 'tests/raw_data'
-    vst = retrieve_vst_data('DP1.10098.001', 'DELA', "2018-01", "2022-01",
-                            savepath=savepath, save_files=True, stacked_df=True)
-
-    vst_data = vst['vst']
-    columns_to_drop_na = ['plotID', 'siteID', 'utmZone', 'easting', 'northing']
-    vst_data = vst_data.dropna(subset=columns_to_drop_na)
+    vst_data = pd.read_csv('tests/raw_data/vst_data.csv')
 
     geometry = [Point(easting, northing) for easting, northing in
                 zip(vst_data['itcEasting'], vst_data['itcNorthing'])]
