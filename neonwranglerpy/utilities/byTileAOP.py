@@ -1,5 +1,4 @@
 """Downloads the AOP data from NEON API."""
-import math
 import os
 import re
 import numpy as np

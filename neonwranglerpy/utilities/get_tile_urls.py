@@ -3,6 +3,7 @@
 from neonwranglerpy.utilities.tools import get_api
 import numpy as np
 
+
 def get_tile_urls(
     month_url,
     easting,
@@ -29,7 +30,10 @@ def get_tile_urls(
             file_urls = [x for x in temp_ if f'_{easting}_{northing}' in x['name']]
         elif isinstance(easting, np.ndarray) and isinstance(northing, np.ndarray):
             for j in range(len(easting)):
-                urls = [x for x in temp_ if f'_{easting.iloc[j]}_{northing.iloc[j]}' in x['name']]
+                urls = [
+                    x for x in temp_
+                    if f'_{easting.iloc[j]}_{northing.iloc[j]}' in x['name']
+                ]
 
                 #     df1 = df.loc[df['name'].str.contains(str(easting[j]))]
                 #     df2 = df.loc[df['name'].str.contains(str(northing[j]))]
