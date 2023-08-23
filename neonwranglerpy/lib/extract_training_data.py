@@ -1,18 +1,20 @@
 """Extract training data from NEON AOP data."""
 import geopandas as gpd
-import cv2
 import os
 import re
+from shapely.geometry import box
+from shapely.geometry import Point
 import numpy as np
 import pandas as pd
+import torch
 import rasterio
 from deepforest import main
 from deepforest import utilities
+from neonwranglerpy.lib.clip_raster import mask_raster
 from neonwranglerpy.lib.retrieve_aop_data import retrieve_aop_data
 
 
 def extract_training_data(vst_data,
-                          geo_data_frame,
                           year,
                           dpID='DP3.30010.001',
                           savepath='/content',
@@ -29,18 +31,15 @@ def extract_training_data(vst_data,
     vst_data = vst['vst']
     columns_to_drop_na = ['plotID', 'siteID', 'utmZone', 'easting', 'northing']
     vst_data = vst_data.dropna(subset=columns_to_drop_na)
-    vst_data.iloc[1:10, :]
-
-    geometry = [Point(easting, northing) for easting, northing in
-                zip(vst_data['itcEasting'], vst_data['itcNorthing'])]
-    epsg_codes = (vst_data['utmZone'].map(lambda x: (326 * 100) +
-                                        int(x[:-1]))).astype(str)
-    geo_data_frame = gpd.GeoDataFrame(vst_data, geometry=geometry, crs=epsg_codes.iloc[0])
-
-    extract_training_data(vst_data=vst_data, geo_data_frame=geo_data_frame, year='2018',
-    dpID='DP3.30010.001', savepath='/content', site='DELA')
     """
     retrieve_aop_data(vst_data, year, dpID, savepath)
+    geometry = [
+        Point(easting, northing)
+        for easting, northing in zip(vst_data['itcEasting'], vst_data['itcNorthing'])
+    ]
+    epsg_codes = (
+        vst_data['utmZone'].map(lambda x: (326 * 100) + int(x[:-1]))).astype(str)
+    geo_data_frame = gpd.GeoDataFrame(vst_data, geometry=geometry, crs=epsg_codes.iloc[0])
     site_level_data = vst_data[vst_data.plotID.str.contains(site)]
     get_tiles = (((site_level_data.easting / 1000).astype(int) * 1000).astype(str) + "_" +
                  ((site_level_data.northing / 1000).astype(int) * 1000).astype(str))
@@ -49,94 +48,39 @@ def extract_training_data(vst_data,
 
     pattern = fr"{year}_{site}_.*_{get_tiles.unique()[0]}"
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     model = main.deepforest()
     model.use_release()
 
+    model.to(device)
+
     all_predictions = []
 
-    section_files = {}
+    directory_path = ""
 
     for root, dirs, files in os.walk(savepath):
         for file in files:
             if re.match(pattern, file):
                 image_file = os.path.join(root, file)
+                directory_path = os.path.dirname(image_file) + '/'
                 print(image_file)
 
-                # Load the image using OpenCV
-                image = cv2.imread(image_file)
+                predictions = model.predict_tile(image_file,
+                                                 return_plot=False,
+                                                 patch_size=300,
+                                                 patch_overlap=0.05)
 
-                affine = None
+                gdf = utilities.boxes_to_shapefile(predictions,
+                                                   root_dir=os.path.dirname(image_file),
+                                                   projected=True)
 
-                # Open the raster file
-                with rasterio.open(image_file) as src:
-                    # Get the bounding box coordinates
-                    affine = src.transform
-
-                    ras_extent = str(int(affine[2])) + "_" + str(int(affine[5]))
-
-                    print(affine)
-
-                    row = site_level_data.loc[get_tiles == ras_extent]
-                    row
-
-                    output_folder = os.path.join(savepath, "data", "rgb")
-                    os.makedirs(output_folder, exist_ok=True)
-
-                    for _, row in vst_data.iterrows():
-                        easting = row.easting
-                        northing = row.northing
-
-                        x_min = int(affine[2] + 10 / affine[0] - easting)
-                        y_min = int(affine[5] + 10 / affine[0] - northing)
-                        x_max = int(affine[2] - 10 / affine[0] - easting)
-                        y_max = int(affine[5] - 10 / affine[0] - northing)
-
-                        file_name = f"section_{x_min}_{y_min}_{x_max}_{y_max}.tif"
-
-                        section_file = os.path.join(output_folder, file_name)
-
-                        if section_file not in section_files:
-                            section = image[y_max:y_min, x_max:x_min, :]
-                            print("Section shape:", section.shape)
-
-                            section_meta = src.meta.copy()
-                            section_meta['width'] = (affine[2] + x_min) - (affine[2] +
-                                                                           x_max)
-                            section_meta['height'] = (affine[5] + y_min) - (affine[5] +
-                                                                            y_max)
-                            section_meta['transform'] = rasterio.Affine(
-                                affine[0], 0, (affine[2] - x_min), 0, affine[4],
-                                (affine[5] - y_min))
-
-                            section_np = np.moveaxis(section, -1, 0)
-
-                            with rasterio.open(section_file, 'w', **section_meta) as dst:
-                                dst.write(section_np)
-                                section_affine = dst.transform
-
-                            section_files[section_file] = section_affine
-
-                            print("Crop affine: ")
-                            print(section_affine)
-
-                            print("Expected file path:", section_file)
-
-                        prediction = model.predict_image(path=section_file)
-
-                        gdf = utilities.boxes_to_shapefile(
-                            prediction,
-                            root_dir=os.path.dirname(section_file),
-                            projected=True)
-
-                        all_predictions.append(gdf)
+                all_predictions.append(gdf)
 
     all_predictions_df = pd.concat(all_predictions)
 
-    all_predictions_df['temp_geo'] = all_predictions_df['geometry']
+    merged_data = gpd.sjoin(all_predictions_df, geo_data_frame, how="inner")
 
-    merged_data = gpd.sjoin(geo_data_frame, all_predictions_df, how="inner", op="within")
-    merged_data.drop(columns=['geometry'], inplace=True)
-    merged_data.rename(columns={'temp_geo': 'geometry'}, inplace=True)
     canopy_position_mapping = {
         np.nan: 0,
         'Full shade': 1,
@@ -168,5 +112,38 @@ def extract_training_data(vst_data,
         subset=['xmin', 'ymin', 'xmax', 'ymax'], keep='first')
 
     clean_predictions = predictions_sorted[~duplicates_mask]
+
+    # destination_root = "/data/rgb"
+
+    for index, row in merged_data.iterrows():
+        plant_status = row['plantStatus']
+        image_path = directory_path + row['image_path']
+        geometry = row['geometry']
+
+        with rasterio.open(image_path) as dataset:
+            affine = dataset.transform
+
+            print(affine)
+            print("bbox", geometry.bounds)
+
+            bbox = box(geometry.bounds[0], geometry.bounds[1], geometry.bounds[2],
+                       geometry.bounds[3])
+
+            print("bbox", bbox)
+
+            dat = rasterio.open(image_path)
+            # creates mask and clips raster
+            out_img, out_meta = mask_raster(dat, bbox)
+
+            destination_folder = os.path.join(savepath, "data", "rgb")
+            os.makedirs(destination_folder, exist_ok=True)
+
+            new_image_path = os.path.join(destination_folder,
+                                          f"{plant_status}_tree_{index}.tif")
+
+            with rasterio.open(new_image_path, "w", **out_meta) as dest:
+                dest.write(out_img)
+
+            print(f"Tree image {index} saved as '{new_image_path}'")
 
     return clean_predictions
