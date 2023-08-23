@@ -113,8 +113,6 @@ def extract_training_data(vst_data,
 
     clean_predictions = predictions_sorted[~duplicates_mask]
 
-    # destination_root = "/data/rgb"
-
     for index, row in merged_data.iterrows():
         plant_status = row['plantStatus']
         image_path = directory_path + row['image_path']
