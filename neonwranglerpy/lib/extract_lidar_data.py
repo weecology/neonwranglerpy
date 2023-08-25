@@ -51,7 +51,7 @@ def extract_lidar_data(rgb_data,
 
                 data = np.vstack((x, y, z)).transpose()
 
-                lidar_dir = savepath + "/data/lidar3"
+                lidar_dir = savepath + "/data/lidar"
                 os.makedirs(lidar_dir, exist_ok=True)
 
                 for index, row in rgb_data.iterrows():
