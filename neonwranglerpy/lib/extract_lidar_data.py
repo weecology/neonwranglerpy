@@ -1,4 +1,4 @@
-"""Some text here."""
+"""Function to extract lidar data using RGB data and vst data."""
 import laspy
 import numpy as np
 import os
@@ -13,9 +13,10 @@ def extract_lidar_data(rgb_data,
                        dpID="DP1.30003.001",
                        site="DELA"):
     """
-    Extract LiDAR data with geo_data_frame and image predictions.
+    Extract LiDAR data using RGB data and vst data.
 
     Arguments:
+    ------------
         rgb_data: GeoDataFrame containing the plot data
         vst_data: DataFrame containing the plot data
         year: Year of the data
