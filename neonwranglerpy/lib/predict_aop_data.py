@@ -4,6 +4,7 @@ import cv2
 import os
 import re
 import matplotlib.pyplot as plt
+import pandas as pd
 from shapely.geometry import Point
 import rasterio
 from deepforest import main
@@ -42,8 +43,8 @@ def predict_aop_data(vst_data,
         vst_data['utmZone'].map(lambda x: (326 * 100) + int(x[:-1]))).astype(str)
     geo_data_frame = gpd.GeoDataFrame(vst_data, geometry=geometry, crs=epsg_codes.iloc[0])
     site_level_data = vst_data[vst_data.plotID.str.contains(site)]
-    get_tiles = ((site_level_data.easting / 1000).astype(int) * 1000).astype(str) + "_"
-    +((site_level_data.northing / 1000).astype(int) * 1000).astype(str)
+    get_tiles = (((site_level_data.easting / 1000).astype(int) * 1000).astype(str) + "_" +
+                 ((site_level_data.northing / 1000).astype(int) * 1000).astype(str))
     print(get_tiles.unique())
 
     pattern = fr"{year}_{site}_.*_{get_tiles.unique()[0]}"
@@ -96,4 +97,6 @@ def predict_aop_data(vst_data,
 
                         all_predictions.append(prediction)
 
-    return all_predictions
+    all_predictions_df = pd.concat(all_predictions)
+
+    return all_predictions_df
