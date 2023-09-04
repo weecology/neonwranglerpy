@@ -2,9 +2,8 @@ import asyncio
 import aiohttp
 import os
 from concurrent.futures import ThreadPoolExecutor
-from os.path import join as pjoin, dirname
-
-
+from os.path import join as pjoin
+from itertools import repeat
 if 'NEONWRANGLER_HOME' in os.environ:
     fury_home = os.environ['NEONWRANGLER_HOME']
 else:
@@ -62,13 +61,12 @@ async def _download(session, url, filename, sem, size=None):
                         # update_progressbar(progress, size)
 
 
-async def _fetcher(batch, headers, rate_limit):
+async def _fetcher(batch, rate_limit, headers):
     """Fetcher for downloading files."""
     sem = asyncio.Semaphore(rate_limit)
     dir_name = '.'.join([
-                'NEON', batch['productCode'], batch['siteCode'], batch['month'],
-                batch['release']
-            ])
+        'NEON', batch['productCode'], batch['siteCode'], batch['month'], batch['release']
+    ])
     d_urls = [file['url'] for file in batch["files"]]
     sizes = [file['size'] for file in batch["files"]]
     f_names = [file['name'] for file in batch["files"]]
@@ -83,15 +81,17 @@ async def _fetcher(batch, headers, rate_limit):
         await asyncio.gather(*tasks)
 
 
-async def fetcher(batch, headers, rate_limit):
+def fetcher(batch, rate_limit, headers):
     try:
-        asyncio.run(_fetcher(batch, headers, rate_limit))
+        asyncio.run(_fetcher(batch, rate_limit, headers))
     except Exception as e:
         print(f"Error processing URLs: {e}")
 
 
-def run_threaded_batches(batches, headers, batch_size, rate_limit):
-    with ThreadPoolExecutor(max_workers=batch_size) as executor:
-        for i in range(batch_size):
-            batch = batches[i * batch_size : min((i + 1) * batch_size, len(batches))]
-            executor.map(fetcher, range(batch_size), batch, headers, rate_limit)
+def run_threaded_batches(batches, batch_size, rate_limit, headers=None):
+    max_thread = 2
+    num_threads = (len(batches) + batch_size - 1) // batch_size
+    with ThreadPoolExecutor(max_workers=max_thread) as executor:
+        for i in range(num_threads):
+            batch = batches[i * batch_size:min((i + 1) * batch_size, len(batches))]
+            executor.map(fetcher, batch, repeat(rate_limit), repeat(headers))
