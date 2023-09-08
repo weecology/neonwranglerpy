@@ -8,10 +8,11 @@ from neonwranglerpy.lib.retrieve_coords_itc import retrieve_coords_itc
 
 def retrieve_vst_data(dpId="DP1.10098.001",
                       site="all",
-                      start_date="",
-                      end_date="",
+                      start_date=None,
+                      end_date=None,
                       method="shp",
                       savepath="",
+                      attributes=None,
                       save_files=False,
                       stacked_df=True):
     """Retrieve Vegetation Structure Data From NEON and Add Individual ID coordinates.
@@ -61,14 +62,14 @@ def retrieve_vst_data(dpId="DP1.10098.001",
         # Adds the UTM coordinates of vst entries based on azimuth and distance
         vst["vst_mappingandtagging"] = retrieve_coords_itc(vst_mappingandtagging)
 
-    attributes = vst_apparentindividual[[
-        'uid', 'individualID', 'eventID', 'tagStatus', 'growthForm', 'plantStatus',
-        'stemDiameter', 'measurementHeight', 'height', 'baseCrownHeight', 'breakHeight',
-        'breakDiameter', 'maxCrownDiameter', 'ninetyCrownDiameter', 'canopyPosition',
-        'shape', 'basalStemDiameter', 'basalStemDiameterMsrmntHeight',
-        'maxBaseCrownDiameter', 'ninetyBaseCrownDiameter'
-    ]]
-
+    if attributes is None:
+        attributes = vst_apparentindividual[[
+            'uid', 'individualID', 'eventID', 'tagStatus', 'growthForm', 'plantStatus',
+            'stemDiameter', 'measurementHeight', 'height', 'baseCrownHeight', 'breakHeight',
+            'breakDiameter', 'maxCrownDiameter', 'ninetyCrownDiameter', 'canopyPosition',
+            'shape', 'basalStemDiameter', 'basalStemDiameterMsrmntHeight',
+            'maxBaseCrownDiameter', 'ninetyBaseCrownDiameter'
+        ]]
     vst['vst_mappingandtagging'].rename(columns={'eventID': 'tagEventID'}, inplace=True)
     csv_vst = pd.merge(attributes,
                        vst["vst_mappingandtagging"],

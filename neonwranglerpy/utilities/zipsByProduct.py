@@ -6,14 +6,15 @@ from urllib.error import HTTPError
 from neonwranglerpy.utilities.tools import get_api, get_month_year_urls
 from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
 from neonwranglerpy.utilities.getzipurls import get_zip_urls
+import neonwranglerpy.fetcher.fetcher as fetcher
 
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
 
 
 def zips_by_product(dpID,
                     site='all',
-                    start_date='',
-                    end_date='',
+                    start_date=None,
+                    end_date=None,
                     package="basic",
                     release="current",
                     savepath='',
@@ -65,12 +66,12 @@ def zips_by_product(dpID,
         return f"{dpID} is not a properly formatted data product ID. The correct format" \
                f" is DP#.#####.00#, where the first placeholder must be between 1 and 4."
 
-    if len(start_date):
+    if start_date is not None:
         if not re.match(DATE_PATTERN, start_date):
             return 'startdate and enddate must be either NA or valid dates in the form '\
                    'YYYY-MM'
 
-    if len(end_date):
+    if end_date is not None:
         if not re.match(DATE_PATTERN, end_date):
             return 'startdate and enddate must be either NA or valid dates in the form ' \
                    'YYYY-MM'
@@ -109,20 +110,17 @@ def zips_by_product(dpID,
         print(f"There is no data for site {site}")
 
     # extracting urls for specified start and end dates
-    if len(start_date):
+    if start_date is not None:
         month_urls = get_month_year_urls(start_date, month_urls, 'start')
 
     if not len(month_urls):
         print("There is no data for selected dates")
 
-    if len(end_date):
+    if end_date is not None:
         month_urls = get_month_year_urls(end_date, month_urls, 'end')
 
     if not len(month_urls):
         print("There is no data for selected dates")
-
-    # list of all the urls of the files
-    temp = get_zip_urls(month_urls, package, dpID, release, token)
 
     # TODO: calculate download size
     # TODO: user input for downloading or not
@@ -135,25 +133,10 @@ def zips_by_product(dpID,
         os.makedirs(savepath)
 
     files_to_stack_path = os.path.join(savepath, "filesToStack")
-    os.mkdir(files_to_stack_path)
-
-    # TODO: add progress bar
+    if not os.path.isdir(files_to_stack_path):
+        os.mkdir(files_to_stack_path)
 
     if files_to_stack_path:
-        for zips in temp:
-            dirname = '.'.join([
-                'NEON', zips['productCode'], zips['siteCode'], zips['month'],
-                zips['release']
-            ])
-            zip_dir_path = os.path.join(files_to_stack_path, f'{dirname}')
-            os.mkdir(zip_dir_path)
-            for file in zips['files']:
-                try:
-                    save_path = os.path.join(zip_dir_path, f"{file['name']}")
-                    file_path, _ = urlretrieve(file['url'], save_path)
-
-                except HTTPError as e:
-                    print("HTTPError :", e)
-                    return None
+        fetcher.run_threaded_batches(month_urls,'vst', rate_limit=2, headers=None, savepath=files_to_stack_path)
     # returns the path to /filestostack directory
     return files_to_stack_path
