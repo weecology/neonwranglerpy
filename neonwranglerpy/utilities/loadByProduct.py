@@ -72,12 +72,12 @@ def load_by_product(dpID,
                f'directly to R with this function.Use the byFileAOP() or ' \
                f'byTileAOP() function to download locally." '
 
-    if len(start_date):
+    if start_date is not None:
         if not match(DATE_PATTERN, start_date):
             return 'startdate and enddate must be either NA or valid dates in' \
                    ' the form YYYY-MM'
 
-    if len(end_date):
+    if end_date is not None:
         if not match(DATE_PATTERN, end_date):
             return 'startdate and enddate must be either NA or valid dates in' \
                    ' the form YYYY-MM'
