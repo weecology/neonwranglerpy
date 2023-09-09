@@ -12,22 +12,29 @@ def get_tile_urls(
     """Get tile urls."""
     file_urls = []
     for i in range(len(month_url)):
-        temp = get_api(month_url[i]).json()
+        temp = get_api(month_url[i]).json()['data']
 
         if not len(temp):
             print(f"No files found for site {temp['data']['siteCode']} and "
                   f"year {temp['data']['month']}.")
             continue
 
-        temp_ = temp['data']['files']
-        # temp_ = json.dumps(temp['data']['files'])
-        # df = pd.read_json(temp_)
-        # # get the files for easting and northing
-
-        # if easting is a signle value and northing is a single value
+        temp_ = temp['files']
+        dataSiteMonth = {
+            "data": {
+                "productCode": temp['productCode'],
+                "siteCode": temp['siteCode'],
+                "month": temp['month'],
+                "release": temp['release'],
+                "packages": temp['packages'],
+                "files": []
+            }
+        }
 
         if isinstance(easting.astype(str), str) and isinstance(northing.astype(str), str):
-            file_urls = [x for x in temp_ if f'_{easting}_{northing}' in x['name']]
+            dataSiteMonth['data']['files'] = [x for x in temp_ if f'_{easting}_{northing}' in x['name']]
+            file_urls.append(dataSiteMonth)
+
         elif isinstance(easting, np.ndarray) and isinstance(northing, np.ndarray):
             for j in range(len(easting)):
                 urls = [
@@ -44,6 +51,8 @@ def get_tile_urls(
 
                 if not len(urls):
                     print(f"no tiles found for {easting[j]} and {northing[j]}")
-                file_urls.extend(urls)
+                dataSiteMonth['data']['files'].append(urls)
+            file_urls.append(dataSiteMonth)
+
     print(f'{len(file_urls)} files found')
     return file_urls
