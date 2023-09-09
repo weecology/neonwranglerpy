@@ -11,7 +11,7 @@ from neonwranglerpy import get_data
 from neonwranglerpy.utilities.tools import get_api
 from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
 from neonwranglerpy.utilities.get_tile_urls import get_tile_urls
-
+import neonwranglerpy.fetcher.fetcher as fetcher
 
 def load_shared_flights():
     """Return the dataframe about the table types of Data Products."""
@@ -134,18 +134,10 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     if not os.path.isdir(savepath):
         os.makedirs(savepath)
 
-    for i in range(len(file_urls)):
-        split_path = file_urls[i]['url'].split('/')
-        dir_path = '/'.join(split_path[4:len(split_path) - 1])
-        save_dir_path = os.path.join(savepath, dir_path)
-        save_file_path = os.path.join(save_dir_path, file_urls[i]['name'])
-        if not os.path.exists(save_dir_path):
-            os.makedirs(save_dir_path)
+    files_to_stack_path = os.path.join(savepath, "filesToStack")
+    if not os.path.isdir(files_to_stack_path):
+        os.mkdir(files_to_stack_path)
 
-        try:
-            file_path, _ = urlretrieve(file_urls[i]['url'], save_file_path)
-        except HTTPError as e:
-            print("HTTPError :", e)
-            return None
-
+    if files_to_stack_path:
+        fetcher.run_threaded_batches(file_urls, 'aop', rate_limit=2, headers=None, savepath=files_to_stack_path)
     return savepath
