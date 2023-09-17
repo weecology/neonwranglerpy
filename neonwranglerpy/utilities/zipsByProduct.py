@@ -137,6 +137,10 @@ def zips_by_product(dpID,
         os.mkdir(files_to_stack_path)
 
     if files_to_stack_path:
-        fetcher.run_threaded_batches(month_urls,'vst', rate_limit=2, headers=None, savepath=files_to_stack_path)
+        fetcher.run_threaded_batches(month_urls,
+                                     'vst',
+                                     rate_limit=2,
+                                     headers=None,
+                                     savepath=files_to_stack_path)
     # returns the path to /filestostack directory
     return files_to_stack_path

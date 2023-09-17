@@ -32,7 +32,9 @@ def get_tile_urls(
         }
 
         if isinstance(easting.astype(str), str) and isinstance(northing.astype(str), str):
-            dataSiteMonth['data']['files'] = [x for x in temp_ if f'_{easting}_{northing}' in x['name']]
+            dataSiteMonth['data']['files'] = [
+                x for x in temp_ if f'_{easting}_{northing}' in x['name']
+            ]
             file_urls.append(dataSiteMonth)
 
         elif isinstance(easting, np.ndarray) and isinstance(northing, np.ndarray):
