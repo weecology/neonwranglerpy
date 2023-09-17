@@ -125,7 +125,7 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     tile_northing = np.floor(northing / 1000).astype(int) * 1000
 
     file_urls = get_tile_urls(month_urls, tile_easting, tile_northing)
-
+    print(f"Tiles Found for Remote Sensing Data: {len(file_urls)}")
     if not savepath:
         savepath = os.path.normpath(os.path.join(os.getcwd(), dpID))
     else:

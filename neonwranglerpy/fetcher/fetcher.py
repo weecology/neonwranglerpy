@@ -71,9 +71,9 @@ async def _fetcher(data, rate_limit, headers, files_to_stack_path="filesToStack"
     dir_name = '.'.join([
         'NEON', data['productCode'], data['siteCode'], data['month'], data['release']
     ])
-    print(f"{data['siteCode']}" + "-" + f"{data['month']}" )
     zip_dir_path = os.path.join(files_to_stack_path, f'{dir_name}')
-    os.mkdir(zip_dir_path)
+    if not os.path.isdir(zip_dir_path):
+        os.mkdir(zip_dir_path)
 
     d_urls = [f['url'] for f in data["files"]]
     sizes = [f['size'] for f in data["files"]]
