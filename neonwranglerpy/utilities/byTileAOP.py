@@ -2,8 +2,6 @@
 import os
 import re
 import numpy as np
-from urllib.error import HTTPError
-from urllib.request import urlretrieve
 import pandas as pd
 import geopandas as gpd
 
