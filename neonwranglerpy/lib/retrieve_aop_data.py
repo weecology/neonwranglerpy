@@ -27,7 +27,6 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
                                    1000).astype(int) * 1000
     coords_for_tiles['northing'] = (coords_for_tiles[['northing']] /
                                     1000).astype(int) * 1000
-    print(coords_for_tiles.easting.shape[0])
     # if there are more than 1 row, drop duplicates
     if coords_for_tiles.easting.shape[0] > 1:
         # drop duplicates values
@@ -58,16 +57,17 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
         if isinstance(dpID, str):
             dpID = [dpID]
 
-    for i in range(coords_for_tiles.easting.shape[0]):
+    tiles_size = tiles.easting.shape[0]
+    for i in range(tiles_size):
         for prd in dpID:
             try:
-                if coords_for_tiles.easting.shape[0] > 1:
+                if tiles_size > 1:
                     tile = tiles.iloc[i, :]
                     siteID = tile['siteID']
                     tile_easting = tile['easting']
                     tile_northing = tile['northing']
                 else:
-                    siteID = tiles['siteID']
+                    siteID = tiles['siteID'][0]
                     tile_easting = tiles['easting'][0]
                     tile_northing = tiles['northing'][0]
 

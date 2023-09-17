@@ -42,8 +42,7 @@ def retrieve_coords_itc(dat):
     na_values = vst_df['stemAzimuth'].isnull().values.sum()
 
     if na_values > 0:
-        print(
-            f"{na_values} entries could not be georeferenced and will be discarded.")
+        print(f"{na_values} entries could not be georeferenced and will be discarded.")
         vst_df.dropna(subset=['stemAzimuth'], axis=0, inplace=True)
         vst_df.reset_index(drop=True, inplace=True)
     # if retrieve_dist_to_utm doesn't work add p[0] as an extra argument to

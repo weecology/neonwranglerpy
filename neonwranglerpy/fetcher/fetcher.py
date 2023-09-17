@@ -6,7 +6,6 @@ from os.path import join as pjoin
 import requests
 from itertools import repeat
 
-
 if 'NEONWRANGLER_HOME' in os.environ:
     fury_home = os.environ['NEONWRANGLER_HOME']
 else:
@@ -35,7 +34,7 @@ async def _request(session, url):
         return await response.json()
 
 
-async def _download(session, url, filename, sem,month, size=None):
+async def _download(session, url, filename, sem, month, size=None):
     """An asynchronous function to download file from url.
 
     Parameters
@@ -68,12 +67,11 @@ async def _fetcher(data, rate_limit, headers, files_to_stack_path="filesToStack"
     """Fetcher for downloading files."""
     sem = asyncio.Semaphore(rate_limit)
     data = data['data']
-    dir_name = '.'.join([
-        'NEON', data['productCode'], data['siteCode'], data['month'], data['release']
-    ])
-    print(f"{data['siteCode']}" + "-" + f"{data['month']}" )
+    dir_name = '.'.join(
+        ['NEON', data['productCode'], data['siteCode'], data['month'], data['release']])
     zip_dir_path = os.path.join(files_to_stack_path, f'{dir_name}')
-    os.mkdir(zip_dir_path)
+    if not os.path.isdir(zip_dir_path):
+        os.mkdir(zip_dir_path)
 
     d_urls = [f['url'] for f in data["files"]]
     sizes = [f['size'] for f in data["files"]]
@@ -106,13 +104,20 @@ def fetcher(batch, data_type, rate_limit, headers, files_to_stack_path):
         print(f"Error processing URLs: {e}")
 
 
-def run_threaded_batches(batches, data_type, rate_limit, headers=None, savepath='/filesToStack'):
+def run_threaded_batches(batches,
+                         data_type,
+                         rate_limit,
+                         headers=None,
+                         savepath='/filesToStack'):
     num_cores = os.cpu_count()  # Get the number of CPU cores
-    num_threads = min(num_cores, len(batches))  # Limit threads to CPU cores or the number of batches, whichever is smaller
+    num_threads = min(
+        num_cores, len(batches)
+    )  # Limit threads to CPU cores or the number of batches, whichever is smaller
 
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         for i in range(num_threads):
             # Distribute the batches evenly among threads
             batch = batches[i::int(num_threads)]
             # executor.submit(fetcher, batch, rate_limit, headers)
-            executor.map(fetcher, batch, repeat(data_type), repeat(rate_limit), repeat(headers), repeat(savepath))
+            executor.map(fetcher, batch, repeat(data_type), repeat(rate_limit),
+                         repeat(headers), repeat(savepath))
