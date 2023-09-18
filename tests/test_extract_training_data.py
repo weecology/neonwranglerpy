@@ -8,7 +8,7 @@ def test_extract_training_data():
     """Test extract_training_data function."""
     savepath = 'tests/raw_data'
     vst_data = pd.read_csv('tests/raw_data/vst_data.csv')
-
+    vst_data = vst_data[:500]
     result = extract_training_data(vst_data=vst_data[:500], year='2018',
                                    dpID='DP3.30010.001', savepath=savepath, site='DELA')
 

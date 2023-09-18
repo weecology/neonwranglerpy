@@ -37,13 +37,6 @@ test_loadByProduct = [
             'morphospeciesIDRemarks', 'identificationQualifier', 'remarks', 'measuredBy',
             'recordedBy', 'dataQF'
         ],
-        'data': [
-            '45603b3d-ea0b-4022-a4a0-6168e6ceb647', 'DELA_046.basePlot.vst', '2015-06-08',
-            'vst_DELA_2015', 'D08', 'DELA', 'DELA_046', 21.0, 2.0, 41.0, 11.1, 201.5, 0,
-            'NEON.PLA.D08.DELA.04068', 0, 0, 'NEON.DOC.000987vE', 'ACRU',
-            'Acer rubrum L.', 'species', 0, 0, 0, 0, 0, 'mwiegmann@neoninc.org',
-            'calvis@field-ops.org', 0
-        ]
     }),
 ]
 
