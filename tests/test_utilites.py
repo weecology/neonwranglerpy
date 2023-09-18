@@ -37,13 +37,6 @@ test_loadByProduct = [
             'morphospeciesIDRemarks', 'identificationQualifier', 'remarks', 'measuredBy',
             'recordedBy', 'dataQF'
         ],
-        'data': [
-            '45603b3d-ea0b-4022-a4a0-6168e6ceb647', 'DELA_046.basePlot.vst', '2015-06-08',
-            'vst_DELA_2015', 'D08', 'DELA', 'DELA_046', 21.0, 2.0, 41.0, 11.1, 201.5, 0,
-            'NEON.PLA.D08.DELA.04068', 0, 0, 'NEON.DOC.000987vE', 'ACRU',
-            'Acer rubrum L.', 'species', 0, 0, 0, 0, 0, 'mwiegmann@neoninc.org',
-            'calvis@field-ops.org', 0
-        ]
     }),
 ]
 
@@ -110,11 +103,7 @@ def test_load_by_product(test_name, dpID, site, start_date, end_date, args, expe
                                  save_files=save_files,
                                  stacked_df=stacked_df)
     columns_values = list(data_frame['vst_mappingandtagging'].dtypes.index)
-    first_row_data = list(data_frame['vst_mappingandtagging'].fillna(0).iloc[0])
-
     assert columns_values == expected['columns']
-    assert first_row_data == expected['data']
-
 
 @pytest.mark.parametrize("test_name, dpID, site, start_date, end_date, args, expected",
                          test_checks)

@@ -2,8 +2,6 @@
 import os
 import re
 import numpy as np
-from urllib.error import HTTPError
-from urllib.request import urlretrieve
 import pandas as pd
 import geopandas as gpd
 
@@ -12,6 +10,7 @@ from neonwranglerpy.utilities.tools import get_api
 from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
 from neonwranglerpy.utilities.get_tile_urls import get_tile_urls
 import neonwranglerpy.fetcher.fetcher as fetcher
+
 
 def load_shared_flights():
     """Return the dataframe about the table types of Data Products."""
@@ -125,7 +124,7 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     tile_northing = np.floor(northing / 1000).astype(int) * 1000
 
     file_urls = get_tile_urls(month_urls, tile_easting, tile_northing)
-
+    print(f"Tiles Found for Remote Sensing Data: {len(file_urls)}")
     if not savepath:
         savepath = os.path.normpath(os.path.join(os.getcwd(), dpID))
     else:
@@ -139,5 +138,9 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
         os.mkdir(files_to_stack_path)
 
     if files_to_stack_path:
-        fetcher.run_threaded_batches(file_urls, 'aop', rate_limit=2, headers=None, savepath=files_to_stack_path)
+        fetcher.run_threaded_batches(file_urls,
+                                     'aop',
+                                     rate_limit=2,
+                                     headers=None,
+                                     savepath=files_to_stack_path)
     return savepath

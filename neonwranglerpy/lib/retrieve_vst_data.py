@@ -65,10 +65,11 @@ def retrieve_vst_data(dpId="DP1.10098.001",
     if attributes is None:
         attributes = vst_apparentindividual[[
             'uid', 'individualID', 'eventID', 'tagStatus', 'growthForm', 'plantStatus',
-            'stemDiameter', 'measurementHeight', 'height', 'baseCrownHeight', 'breakHeight',
-            'breakDiameter', 'maxCrownDiameter', 'ninetyCrownDiameter', 'canopyPosition',
-            'shape', 'basalStemDiameter', 'basalStemDiameterMsrmntHeight',
-            'maxBaseCrownDiameter', 'ninetyBaseCrownDiameter'
+            'stemDiameter', 'measurementHeight', 'height', 'baseCrownHeight',
+            'breakHeight', 'breakDiameter', 'maxCrownDiameter', 'ninetyCrownDiameter',
+            'canopyPosition', 'shape', 'basalStemDiameter',
+            'basalStemDiameterMsrmntHeight', 'maxBaseCrownDiameter',
+            'ninetyBaseCrownDiameter'
         ]]
     vst['vst_mappingandtagging'].rename(columns={'eventID': 'tagEventID'}, inplace=True)
     csv_vst = pd.merge(attributes,

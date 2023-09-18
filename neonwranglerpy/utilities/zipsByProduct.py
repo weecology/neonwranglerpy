@@ -1,11 +1,8 @@
 """Download the data files from NEON API."""
 import re
 import os.path
-from urllib.request import urlretrieve
-from urllib.error import HTTPError
 from neonwranglerpy.utilities.tools import get_api, get_month_year_urls
 from neonwranglerpy.utilities.defaults import NEON_API_BASE_URL
-from neonwranglerpy.utilities.getzipurls import get_zip_urls
 import neonwranglerpy.fetcher.fetcher as fetcher
 
 DATE_PATTERN = re.compile('20[0-9]{2}-[0-9]{2}')
@@ -137,6 +134,10 @@ def zips_by_product(dpID,
         os.mkdir(files_to_stack_path)
 
     if files_to_stack_path:
-        fetcher.run_threaded_batches(month_urls,'vst', rate_limit=2, headers=None, savepath=files_to_stack_path)
+        fetcher.run_threaded_batches(month_urls,
+                                     'vst',
+                                     rate_limit=2,
+                                     headers=None,
+                                     savepath=files_to_stack_path)
     # returns the path to /filestostack directory
     return files_to_stack_path
