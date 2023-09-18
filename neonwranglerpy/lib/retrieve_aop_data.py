@@ -24,9 +24,9 @@ def retrieve_aop_data(data, year=2019, dpID=['DP3.30006.001'], savepath=""):
     coords_for_tiles = data[['plotID', 'siteID', 'utmZone', 'easting', 'northing']]
     # get tiles dimensions
     coords_for_tiles['easting'] = (coords_for_tiles[['easting']] /
-                                   1000).astype(int) * 1000
+                                   1000).astype(int, errors='ignore') * 1000
     coords_for_tiles['northing'] = (coords_for_tiles[['northing']] /
-                                    1000).astype(int) * 1000
+                                    1000).astype(int, errors='ignore') * 1000
     # if there are more than 1 row, drop duplicates
     if coords_for_tiles.easting.shape[0] > 1:
         # drop duplicates values

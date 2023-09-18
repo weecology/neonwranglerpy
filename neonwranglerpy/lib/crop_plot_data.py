@@ -9,8 +9,9 @@ from neonwranglerpy.lib.clip_plot import clip_plot
 
 def list_files(path):
     """List all the files in a path of given format."""
-    mask = path + '/**/*.[th][i5]'
-    files = glob(mask, recursive=True)
+    mask_tif = path + "/**/*.tif"
+    mask_h5 = path + "/**/*.h5"
+    files = glob(mask_tif, recursive=True) + glob(mask_h5, recursive=True)
     return files
 
 
@@ -23,12 +24,11 @@ def crop_data_to_plot(plt,
                       parallelized=False,
                       savepath=""):
     """Create shapefiles out of a vegetation structure data with lat/lon coordinates."""
-    dataset_path = os.path.normpath(dataset_path)
+    dataset_path = os.path.abspath(dataset_path)
     full_files = list_files(dataset_path)
     files = [file for file in full_files if dpID in file]
     files = [file for file in files if str(target_year) in file]
 
-    # TODO: add check if files for targeted year and product is not present
     plots = plt[['plotID', 'subplotID', 'siteID', 'utmZone', 'easting', 'northing']]
 
     plots = plots.groupby(['plotID', 'subplotID', 'siteID',

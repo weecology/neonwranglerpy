@@ -77,9 +77,9 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     if not len(month_urls):
         print(f"There is no data for site {site} and year {year}")
 
-    if isinstance(easting, (int, float)):
-        easting = [easting]
-        northing = [northing]
+    # if isinstance(easting, (int, float)):
+    #     easting = [easting]
+    #     northing = [northing]
     # convert the easting and northing for BLAN site
     if site == "BLAN":
         if isinstance(easting, (int, list)):
@@ -124,7 +124,7 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     tile_northing = np.floor(northing / 1000).astype(int) * 1000
 
     file_urls = get_tile_urls(month_urls, tile_easting, tile_northing)
-    print(f"Tiles Found for Remote Sensing Data: {len(file_urls)}")
+    # print(f"Tiles Found for Remote Sensing Data: {len(file_urls)}")
     if not savepath:
         savepath = os.path.normpath(os.path.join(os.getcwd(), dpID))
     else:
@@ -133,14 +133,14 @@ def by_tile_aop(dpID, site, year, easting, northing, buffer=0, savepath=None):
     if not os.path.isdir(savepath):
         os.makedirs(savepath)
 
-    files_to_stack_path = os.path.join(savepath, "filesToStack")
-    if not os.path.isdir(files_to_stack_path):
-        os.mkdir(files_to_stack_path)
+    # files_to_stack_path = os.path.join(savepath, "filesToStack")
+    # if not os.path.isdir(files_to_stack_path):
+    #     os.mkdir(files_to_stack_path)
 
-    if files_to_stack_path:
+    if savepath:
         fetcher.run_threaded_batches(file_urls,
                                      'aop',
                                      rate_limit=2,
                                      headers=None,
-                                     savepath=files_to_stack_path)
+                                     savepath=savepath)
     return savepath
