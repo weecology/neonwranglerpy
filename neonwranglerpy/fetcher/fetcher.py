@@ -67,7 +67,11 @@ async def _download(session, url, filename, sem, size=None):
                         # update_progressbar(progress, size)
 
 
-async def _fetcher(data, rate_limit, headers, files_to_stack_path="filesToStack", data_type="vst"):
+async def _fetcher(data,
+                   rate_limit,
+                   headers,
+                   files_to_stack_path="filesToStack",
+                   data_type="vst"):
     """Fetcher for downloading files."""
     sem = asyncio.Semaphore(rate_limit)
     data = data['data']
@@ -76,8 +80,9 @@ async def _fetcher(data, rate_limit, headers, files_to_stack_path="filesToStack"
     sizes = [f['size'] for f in data["files"]]
     f_names = [f['name'] for f in data["files"]]
     if data_type == "vst":
-        dir_name = '.'.join(
-            ['NEON', data['productCode'], data['siteCode'], data['month'], data['release']])
+        dir_name = '.'.join([
+            'NEON', data['productCode'], data['siteCode'], data['month'], data['release']
+        ])
         zip_dir_path = os.path.join(files_to_stack_path, f'{dir_name}')
         if not os.path.isdir(zip_dir_path):
             os.mkdir(zip_dir_path)
@@ -117,7 +122,8 @@ def fetcher(batch, data_type, rate_limit, headers, files_to_stack_path):
         if data_type == 'vst':
             asyncio.run(vst_fetcher(batch, rate_limit, headers, files_to_stack_path))
         elif data_type == 'aop':
-            asyncio.run(_fetcher(batch, rate_limit, headers, files_to_stack_path, data_type))
+            asyncio.run(
+                _fetcher(batch, rate_limit, headers, files_to_stack_path, data_type))
 
     except Exception as e:
         print(f"Error processing URLs: {e}")
