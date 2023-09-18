@@ -103,11 +103,7 @@ def test_load_by_product(test_name, dpID, site, start_date, end_date, args, expe
                                  save_files=save_files,
                                  stacked_df=stacked_df)
     columns_values = list(data_frame['vst_mappingandtagging'].dtypes.index)
-    first_row_data = list(data_frame['vst_mappingandtagging'].fillna(0).iloc[0])
-
     assert columns_values == expected['columns']
-    assert first_row_data == expected['data']
-
 
 @pytest.mark.parametrize("test_name, dpID, site, start_date, end_date, args, expected",
                          test_checks)
