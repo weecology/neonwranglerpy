@@ -44,7 +44,7 @@ jobs:
     - name: Test with pytest
       run: |
         ${{ matrix.venv_activate }}
-        pytest -v -k "not (test_retrieve_vst_dat or test_load_by_product)" --cov=./neonwranglerpy --cov-report=xml
+        pytest -v -k "not test_extract_training_data" --cov=./neonwranglerpy --cov-report=xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
