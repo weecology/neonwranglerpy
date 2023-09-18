@@ -35,7 +35,7 @@ async def _request(session, url):
         return await response.json()
 
 
-async def _download(session, url, filename, sem, month, size=None):
+async def _download(session, url, filename, sem, size=None):
     """Asynchronous function to download file from url.
 
     Parameters
@@ -58,6 +58,7 @@ async def _download(session, url, filename, sem, month, size=None):
                 size = response.content_length if not size else size
                 block = size
                 copied = 0
+
                 with open(filename, mode='wb') as f:
                     async for chunk in response.content.iter_chunked(block):
                         f.write(chunk)
@@ -66,26 +67,44 @@ async def _download(session, url, filename, sem, month, size=None):
                         # update_progressbar(progress, size)
 
 
-async def _fetcher(data, rate_limit, headers, files_to_stack_path="filesToStack"):
+async def _fetcher(data,
+                   rate_limit,
+                   headers,
+                   files_to_stack_path="filesToStack",
+                   data_type="vst"):
     """Fetcher for downloading files."""
     sem = asyncio.Semaphore(rate_limit)
     data = data['data']
-    dir_name = '.'.join(
-        ['NEON', data['productCode'], data['siteCode'], data['month'], data['release']])
-    zip_dir_path = os.path.join(files_to_stack_path, f'{dir_name}')
-    if not os.path.isdir(zip_dir_path):
-        os.mkdir(zip_dir_path)
 
     d_urls = [f['url'] for f in data["files"]]
     sizes = [f['size'] for f in data["files"]]
     f_names = [f['name'] for f in data["files"]]
-    f_paths = [pjoin(zip_dir_path, name) for name in f_names]
-    month = [data['month']]
+    if data_type == "vst":
+        dir_name = '.'.join([
+            'NEON', data['productCode'], data['siteCode'], data['month'], data['release']
+        ])
+        zip_dir_path = os.path.join(files_to_stack_path, f'{dir_name}')
+        if not os.path.isdir(zip_dir_path):
+            os.mkdir(zip_dir_path)
+        f_paths = [pjoin(zip_dir_path, name) for name in f_names]
+    else:
+        f_paths = []
+        zip_dir_path = os.path.join(files_to_stack_path, data['productCode'])
+        if not os.path.isdir(zip_dir_path):
+            os.mkdir(zip_dir_path)
+        for i in range(len(d_urls)):
+            split_path = d_urls[i].split('/')
+            dir_path = '/'.join(split_path[4:len(split_path) - 1])
+            save_dir_path = pjoin(zip_dir_path, dir_path)
+            if not os.path.exists(save_dir_path):
+                os.makedirs(save_dir_path)
+            f_paths.append(os.path.join(save_dir_path, f_names[i]))
+
     zip_url = zip(d_urls, f_paths, sizes)
     async with aiohttp.ClientSession() as session:
         tasks = []
         for url, name, sz in zip_url:
-            task = asyncio.create_task(_download(session, url, name, sem, month, sz))
+            task = asyncio.create_task(_download(session, url, name, sem, sz))
             tasks.append(task)
 
         await asyncio.gather(*tasks)
@@ -94,7 +113,7 @@ async def _fetcher(data, rate_limit, headers, files_to_stack_path="filesToStack"
 async def vst_fetcher(item, rate_limit, headers, files_to_stack_path="filesToStack"):
     """Vst fetcher gets the urls for the files of vst data."""
     data = requests.get(item).json()
-    await _fetcher(data, rate_limit, headers, files_to_stack_path)
+    await _fetcher(data, rate_limit, headers, files_to_stack_path, "vst")
 
 
 def fetcher(batch, data_type, rate_limit, headers, files_to_stack_path):
@@ -103,7 +122,8 @@ def fetcher(batch, data_type, rate_limit, headers, files_to_stack_path):
         if data_type == 'vst':
             asyncio.run(vst_fetcher(batch, rate_limit, headers, files_to_stack_path))
         elif data_type == 'aop':
-            asyncio.run(_fetcher(batch, rate_limit, headers, files_to_stack_path))
+            asyncio.run(
+                _fetcher(batch, rate_limit, headers, files_to_stack_path, data_type))
 
     except Exception as e:
         print(f"Error processing URLs: {e}")
