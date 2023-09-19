@@ -1,35 +1,52 @@
 import unittest
 import numpy as np
-import h5py
+import subprocess
 import os
+import pytest
 
-class TestFunc(unittest.TestCase):
+from neonwranglerpy.lib.extract_hsi_to_tif import h5refl2array
 
-    def setUp(self):
-        # Prepare a dummy hdf5 file for testing
-        self.filename = "testfile.h5"
-        with h5py.File(self.filename, 'w') as f:
-            # create datasets in the hdf5 file similar to the actual data the function expects
-            ## Omitted here for brevity
+# Main Paths
+file_location = os.path.dirname(os.path.realpath(__file__))
+neonwranglerpy_root_dir = os.path.abspath(os.path.join(file_location, os.pardir))
 
-    def test_reflection2array(self):
-        reflArray, metadata, sol_az, sol_zn, sns_az, sns_zn = h5refl2array(self.filename)
+# Paths of the raw data files used
+raw_dir_files = os.path.normpath(os.path.join(neonwranglerpy_root_dir, 'raw_data'))
 
-        # Test the type of the returned objects
-        self.assertTrue(isinstance(reflArray, np.ndarray))
-        self.assertTrue(isinstance(metadata, dict))
-        self.assertTrue(isinstance(sol_az, list))
-        self.assertTrue(isinstance(sol_zn, list))
-        self.assertTrue(isinstance(sns_az, np.ndarray))
-        self.assertTrue(isinstance(sns_zn, np.ndarray))
+test_reflection2array_data = [
+    ('test_reflection2array', "h5_data/DP3.30006.001/2017/FullSite/D16/2017_ABBY_1/L3/Spectrometer/Reflectance"
+                              "/NEON_D16_ABBY_DP3_559000_5070000_reflectance.h5")
+]
 
-        # Test the shape or any other property of the returned objects
-        # This will really depend on what you're expecting
-        ## Omitted here for brevity
 
-    def tearDown(self):
-        # Removes the test file
-        os.remove(self.filename)
+def setup_module():
+    """Automatically sets up the environment before the module runs."""
+    os.chdir(neonwranglerpy_root_dir)
+    subprocess.call(['cp', '-r', 'tests/raw_data', neonwranglerpy_root_dir])
 
-if __name__ == '__main__':
-    unittest.main()
+
+def teardown_module():
+    """Automatically clean up after the module."""
+    os.chdir(neonwranglerpy_root_dir)
+    subprocess.call(['rm', '-r', 'raw_data'])
+
+
+def setup_functions():
+    """Set up functions."""
+    teardown_module()
+    setup_module()
+
+
+@pytest.mark.parametrize("test_name, path", test_reflection2array_data)
+def test_reflection2array(test_name, path):
+    setup_functions()
+    path = os.path.join(raw_dir_files, path)
+    reflArray, metadata, sol_az, sol_zn, sns_az, sns_zn = h5refl2array(path)
+
+    # Test the type of the returned objects
+    assert (isinstance(reflArray, np.ndarray))
+    assert (isinstance(metadata, dict))
+    assert (isinstance(sol_az,  np.ndarray))
+    assert (isinstance(sol_zn,  np.ndarray))
+    assert (isinstance(sns_az, np.ndarray))
+    assert (isinstance(sns_zn, np.ndarray))

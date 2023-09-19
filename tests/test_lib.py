@@ -49,7 +49,15 @@ test_generate_raster_data = [
         'utmZone': ['6N', '6N'],
         'easting': [559120, 559120],
         'northing': [5070120, 5070120]
-    }, "DP3.30015.001", "raster_data", "2018", ["NEON_D16_ABBY_DP3_559000_5070000_CHM.tif", True])
+    }, "DP3.30015.001", "raster_data", "2018", ["NEON_D16_ABBY_DP3_559000_5070000_CHM.tif", True]),
+    ('test_extract_h5', {
+        'plotID': ['TEST_0000', 'TEST_0000'],
+        'subplotID': ['A', "A"],
+        'siteID': ['ABBY', 'ABBY'],
+        'utmZone': ['6N', '6N'],
+        'easting': [559120, 559120],
+        'northing': [5070120, 5070120]
+    }, "DP3.30006.001", "h5_data", "2017", ["NEON_D16_ABBY_DP3_559000_5070000_reflectance_hyperspectral.tif", True])
 ]
 
 
