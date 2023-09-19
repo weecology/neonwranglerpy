@@ -19,7 +19,7 @@ def crop_data_to_plot(plt,
                       dpID='DP3.30006.001',
                       dataset_path="",
                       target_year=2018,
-                      bff=520,
+                      bff=20,
                       tasks=1,
                       parallelized=False,
                       savepath=""):

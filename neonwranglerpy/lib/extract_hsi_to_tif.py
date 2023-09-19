@@ -48,21 +48,25 @@ def h5refl2array(refl_filename, remove_water_bands=True):
     sns_zn = hdf5_file[sitename]['Reflectance/Metadata/to-sensor_zenith_angle'][()]
     # get solar angles as array to leverage flightpaths mosaic
     flightpaths = [
-        hdf5_file[sitename]['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index']
-        [()]
+        hdf5_file[sitename][
+            'Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
     ]
     sol_zn = [
-        hdf5_file[sitename]['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index']
-        [()]
+        hdf5_file[sitename][
+            'Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
     ]
     sol_az = [
-        hdf5_file[sitename]['Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index']
-        [()]
+        hdf5_file[sitename][
+            'Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index'][()]
     ]
-    for pt in range(len(solar_angles)):
-        sol_az[flightpaths == solar_angles[pt][0]] = solar_angles[pt][1]
-        sol_zn[flightpaths == solar_angles[pt][0]] = solar_angles[pt][2]
+    # turn sol_az and sol_zn into arrays
+    sol_zn = np.array(sol_zn)
+    sol_az = np.array(sol_az)
 
+    for pt in range(len(solar_angles)):
+        good_pixels = flightpaths == solar_angles[pt][0]
+        sol_az[good_pixels] = solar_angles[pt][1]
+        sol_zn[good_pixels] = solar_angles[pt][2]
 
 #
     mapInfo_string = str(metadata['mapInfo'])
@@ -101,8 +105,9 @@ def tile_solar_angle(full_path):
     file_attrs_string = str(list(hdf5_file.items()))
     file_attrs_string_split = file_attrs_string.split("'")
     sitename = file_attrs_string_split[1]
-    flight_paths = hdf5_file[sitename]
-    ["Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"].attrs["Data_Files"]
+    flight_paths = hdf5_file[
+        sitename]["Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"
+                  ].attrs["Data_Files"]
     flight_paths = str(flight_paths).split(",")
     which_paths = np.unique(
         hdf5_file[sitename]["Reflectance/Metadata/Ancillary_Imagery/Data_Selection_Index"]
@@ -291,7 +296,12 @@ def generate_raster(h5_path,
             os.path.basename(rgb_filename))[0] + "_hyperspectral{}.tif".format(suffix)
 
     # stach solar and sensor data to be used for corrections
-    sol_sens_angle = np.array([sol_az, sol_zn, sns_az, sns_zn])
+    sol_az_reshaped = sol_az.squeeze()  # Remove the extra dimension
+    sol_zn_reshaped = sol_zn.squeeze()  # Remove the extra dimension
+    sns_az_reshaped = sns_az  # No need to reshape sns_az
+    sns_zn_reshaped = sns_zn
+
+    sol_sens_angle = np.array([sol_az_reshaped, sol_zn_reshaped, sns_az_reshaped, sns_zn_reshaped])
     solar_tilename = os.path.splitext(
         os.path.basename(rgb_filename))[0] + "_solar_sensor_angle{}.tif".format(suffix)
     # Save georeference crop to file
