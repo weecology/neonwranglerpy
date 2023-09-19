@@ -10,7 +10,7 @@ def clip_plot(plt, list_data, bff=12, savepath=""):
     # plt['easting'] = plt['easting'].astype(int)
     # plt['northing'] = plt['northing'].astype(int)
     # tile = plt["plt_e"].values.astype(str) + "_" + plt["plt_n"].values.astype(str)
-    tiles = str(plt.plt_e[0]) + "_" + str(plt.plt_n[0])
+    tiles = str(plt["plt_e"]) + "_" + str(plt["plt_n"])
     tiles = [f for f in list_data if tiles in f]
     missed_plots = []
 

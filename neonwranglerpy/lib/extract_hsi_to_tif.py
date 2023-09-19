@@ -192,6 +192,9 @@ def array2raster(newRaster,
     originY = extent['yMax']
     res = reflArray_metadata['res']['pixelWidth']
     transform = Affine.translation(originX, originY) * Affine.scale(res, -res)
+
+    if not os.path.exists(ras_dir):
+        os.makedirs(ras_dir)
     with rasterio.open(
             "{}/{}".format(ras_dir, newRaster),
             'w',
@@ -306,6 +309,7 @@ def generate_raster(h5_path,
     solar_tilename = os.path.splitext(
         os.path.basename(rgb_filename))[0] + "_solar_sensor_angle{}.tif".format(suffix)
     # Save georeference crop to file
+    save_dir = os.path.abspath(save_dir)
     array2raster(solar_tilename,
                  sol_sens_angle,
                  metadata,
